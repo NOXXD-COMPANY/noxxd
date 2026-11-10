@@ -24,8 +24,8 @@ function Typed({ text }) {
   const shown = reduced ? text : text.slice(0, n)
   const typing = shown.length < text.length
   return (
-    <div ref={ref} className="mt-9 border border-line-2 bg-bg p-6">
-      <p className="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold text-accent">
+    <div ref={ref} className="card mt-9 p-6">
+      <p className="mb-3 flex items-center gap-2 text-xs font-semibold text-accent">
         <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z" />
         </svg>
@@ -60,12 +60,12 @@ function Sheets() {
         return (
           <li
             key={pt}
-            className="absolute top-4 left-1/2 flex aspect-[1/1.414] w-[42%] flex-col gap-2 border border-line-2 bg-white p-4 transition-transform duration-500 ease-out-expo [transform:translateX(calc(-50%+var(--x0)))_rotate(var(--r0))] group-hover:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))] group-focus-visible:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))]"
+            className="absolute top-4 left-1/2 flex aspect-[1/1.414] w-[42%] flex-col gap-2 rounded-sm border border-line-2 bg-raised p-4 scope-light shadow-2 transition-transform duration-(--dur-3) ease-out-expo [transform:translateX(calc(-50%+var(--x0)))_rotate(var(--r0))] group-hover:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))] group-focus-visible:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))]"
             style={{ '--x0': `${k * 24}%`, '--x1': `${k * 36}%`, '--r0': `${k * 4}deg`, '--r1': `${k * 7}deg`, zIndex: 5 - Math.abs(k) }}
           >
-            <strong className="font-product text-[0.8125rem] leading-tight text-accent-ink">{t(pt, en)}</strong>
+            <strong className="font-product text-xs leading-tight text-accent-ink">{t(pt, en)}</strong>
             {[90, 100, 75, 85].map((w) => <i key={w} aria-hidden="true" className="h-1 bg-line" style={{ width: `${w}%` }} />)}
-            <small className="mt-auto font-mono text-[0.625rem] text-text-2">CRP 00/000000</small>
+            <small className="mt-auto font-mono text-2xs text-text-2">CRP 00/000000</small>
           </li>
         )
       })}
@@ -92,9 +92,9 @@ function Caritas() {
       >
         <div className="mt-16 grid gap-10 border-t border-line pt-10 md:grid-cols-2 md:gap-16">
           <div>
-            <p className="flex flex-wrap items-center gap-3 text-[0.9375rem] text-text-2">
+            <p className="flex flex-wrap items-center gap-3 text-md text-text-2">
               <T pt="Link público de agendamento" en="Public booking link" />
-              <code className="bg-tint px-2.5 py-1 font-mono text-[0.875rem] text-accent-ink">/agendar/:slug</code>
+              <code className="rounded-sm bg-tint px-2.5 py-1 font-mono text-sm text-accent-ink">/agendar/:slug</code>
             </p>
             <ul className="mt-6 border-t border-line">
               {[
@@ -103,13 +103,13 @@ function Caritas() {
                 [t('4,55 / 5', '4.55 / 5'), t('em heurísticas de Nielsen', 'on Nielsen heuristics')],
               ].map(([strong, text]) => (
                 <li key={text} className="flex gap-3 border-b border-line py-3 text-text-2">
-                  <strong className="min-w-[5.5rem] font-product text-accent-ink">{strong}</strong> {text}
+                  <strong className="min-w-[5.5rem] h-display">{strong}</strong> {text}
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="font-product font-bold text-accent-ink">
+            <p className="h-display">
               <a href="#anamnese" className="underline decoration-line-2 underline-offset-4 hover:decoration-current">
                 <T pt="Anamnese guiada em 7 etapas" en="Guided 7-step intake" />
               </a>
@@ -124,7 +124,7 @@ function Caritas() {
                 ['Quadro clínico', 'Clinical picture'],
                 ['Finalização', 'Wrap-up'],
               ].map(([pt, en], i) => (
-                <li key={pt} className="flex gap-3 border-b border-line py-2.5 text-[0.9375rem] text-text-2">
+                <li key={pt} className="flex gap-3 border-b border-line py-2.5 text-md text-text-2">
                   <span className="font-mono text-accent">{i + 1}</span>
                   {t(pt, en)}
                 </li>
@@ -144,7 +144,7 @@ function Caritas() {
       />
 
       <section id="prontuario" className="section" aria-labelledby="rec-title">
-        <div className="wrap grid gap-12 md:grid-cols-2 md:gap-16">
+        <div data-stagger className="wrap grid gap-12 md:grid-cols-2 md:gap-16">
           <div>
             <H2 id="rec-title">{t('Menos papelada, mais sessão', 'Less paperwork, more session time')}</H2>
             <p className="lead mt-6">
@@ -153,7 +153,7 @@ function Caritas() {
                 en="A psychological record that organizes patient history and saves itself, so attention stays on the session."
               />
             </p>
-            <p className="mt-8 text-[0.875rem] font-semibold text-text-2"><T pt="Criador de questionários personalizados" en="Custom questionnaire builder" /></p>
+            <p className="mt-8 text-sm font-semibold text-text-2"><T pt="Criador de questionários personalizados" en="Custom questionnaire builder" /></p>
             <ul className="mt-3 flex flex-wrap gap-2">
               {[
                 ['Texto curto', 'Short text'],
@@ -163,7 +163,7 @@ function Caritas() {
                 ['Escala 1 a 10', '1 to 10 scale'],
                 ['Data', 'Date'],
               ].map(([pt, en]) => (
-                <li key={pt} className="bg-tint px-3 py-1.5 text-[0.875rem] font-semibold text-accent-ink">{t(pt, en)}</li>
+                <li key={pt} className="chip">{t(pt, en)}</li>
               ))}
             </ul>
           </div>
@@ -180,7 +180,7 @@ function Caritas() {
               ],
             ].map(([dt, dd]) => (
               <div key={dt} className="border-b border-line py-5">
-                <dt className="font-product text-[1.125rem] font-bold text-accent-ink">{dt}</dt>
+                <dt className="h-display text-lg">{dt}</dt>
                 <dd className="mt-1 text-text-2">{dd}</dd>
               </div>
             ))}
@@ -189,7 +189,7 @@ function Caritas() {
       </section>
 
       <section className="section border-t border-line bg-surface" aria-labelledby="ai-title">
-        <div className="wrap grid items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+        <div data-stagger className="wrap grid items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
           <div>
             <H2 id="ai-title">{t('Resumo clínico com I.A., julgamento humano', 'AI clinical summaries, human judgment')}</H2>
             <p className="lead mt-6">
@@ -225,7 +225,7 @@ function Caritas() {
       </section>
 
       <section className="section border-t border-line" aria-labelledby="docs-title">
-        <div className="wrap grid items-center gap-12 md:grid-cols-2 md:gap-16">
+        <div data-stagger className="wrap grid items-center gap-12 md:grid-cols-2 md:gap-16">
           <Sheets />
           <div>
             <H2 id="docs-title">{t('Documentos oficiais do CFP em um clique', 'Official CFP documents in one click')}</H2>
@@ -249,7 +249,7 @@ function Caritas() {
       </section>
 
       <section id="anamnese" className="section border-t border-line" aria-labelledby="intake-title">
-        <div className="wrap">
+        <div data-reveal className="wrap">
           <H2 id="intake-title">{t('Anamnese completa, da primeira sessão ao plano terapêutico', 'A complete intake, from first session to treatment plan')}</H2>
           <p className="lead mt-6">
             <T
@@ -279,7 +279,7 @@ function Caritas() {
       </section>
 
       <section className="section border-t border-line" aria-labelledby="trust-title">
-        <div className="wrap">
+        <div data-reveal className="wrap">
           <H2 id="trust-title">{t('Sigilo e conformidade por padrão', 'Confidentiality and compliance by default')}</H2>
           <p className="lead mt-6">
             <T
@@ -287,7 +287,7 @@ function Caritas() {
               en="Sensitive personal health data handled under the LGPD (Art. 5, II and Art. 11) and Federal Council of Psychology resolutions."
             />
           </p>
-          <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" data-stagger>
             {[
               [t('Guarda de 5 anos', '5-year retention'), t('Exclusão cadastral vira anonimização: CPF e telefone saem, o prontuário exigido pelo CFP permanece íntegro.', 'Account deletion becomes anonymization: ID and phone are removed, while the CFP-mandated record stays intact.')],
               [t('Trilha de auditoria', 'Audit trail'), t('Log append-only de visualizações, logins, alterações e exportações (Art. 37 da LGPD).', 'Append-only log of views, logins, edits and exports (LGPD Art. 37).')],
@@ -297,8 +297,8 @@ function Caritas() {
               [t('Líder clínico', 'Clinic lead'), t('Gestão de até 8 psicólogos com métricas agregadas, sem quebrar o sigilo das anotações.', 'Manage up to 8 psychologists with aggregate metrics, without breaking note confidentiality.')],
             ].map(([title, text]) => (
               <div key={title} className="border-t border-accent pt-5">
-                <h3 className="font-product text-[1.125rem] font-bold text-accent-ink">{title}</h3>
-                <p className="mt-2 text-[0.9375rem] text-text-2">{text}</p>
+                <h3 className="h-display text-lg">{title}</h3>
+                <p className="mt-2 text-md text-text-2">{text}</p>
               </div>
             ))}
           </div>

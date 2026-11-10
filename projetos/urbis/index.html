@@ -2,11 +2,13 @@
 <html lang="pt-BR" data-title-en="Urbis — Urban maintenance and city management | NOXXD">
 <head>
   <meta charset="UTF-8">
-  <script>try{localStorage.getItem('noxxd_lang')==='en'&&document.documentElement.setAttribute('data-wait','')}catch(e){}</script>
+  <script>try{var d=document.documentElement,s=localStorage,t=s.getItem('noxxd_theme');s.getItem('noxxd_lang')==='en'&&d.setAttribute('data-wait','');(t==='dark'||t==='light')&&d.setAttribute('data-theme',t)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Urbis — Zeladoria urbana e gestão municipal | NOXXD</title>
   <meta name="description" content="Urbis, desenvolvido pela NOXXD: app do cidadão em React Native e painel web da prefeitura em Next.js com mapa de calor, para zeladoria urbana, alertas da Defesa Civil e turismo.">
-  <meta name="theme-color" content="#FAFAF9">
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <meta property="og:title" content="Urbis — Zeladoria urbana e gestão municipal | NOXXD">
   <meta property="og:description" content="App do cidadão + centro de comando geoespacial para prefeituras. Desenvolvido pela NOXXD.">
   <meta property="og:url" content="https://noxxd.com.br/projetos/urbis/">
@@ -15,10 +17,6 @@
   <meta property="og:locale" content="pt_BR">
   <link rel="canonical" href="https://noxxd.com.br/projetos/urbis/">
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@700&family=Source+Code+Pro:wght@400&family=Manrope:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="root"></div>

@@ -1,29 +1,110 @@
 @import "tailwindcss";
 
-/* NOXXD: flat, 0px radius, hairline borders, warm stone neutrals.
-   Project pages swap only --p-* (accent, ink, tint, display face). */
-@theme {
-  --color-bg: #FAFAF9;
-  --color-surface: #F5F5F4;
-  --color-ink: #1C1917;
-  --color-text-2: #57534E;
-  --color-sage: #A8A29E;
-  --color-stone: #78716C;
-  --color-stone-hover: #57534E;
-  --color-stone-active: #44403C;
-  --color-line: #E7E5E4;
-  --color-line-2: #D6D3D1;
-  --color-night: #1C1917;
-  --color-night-2: #A8A29E;
+/* Self-hosted variable fonts, latin subset only: no third-party request, one file per family. */
+@font-face { font-family: 'Inter'; font-weight: 100 900; font-display: swap; src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Libre Baskerville'; font-weight: 400 700; font-display: swap; src: url('../node_modules/@fontsource-variable/libre-baskerville/files/libre-baskerville-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Code Pro'; font-weight: 200 900; font-display: swap; src: url('../node_modules/@fontsource-variable/source-code-pro/files/source-code-pro-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 200 800; font-display: swap; src: url('../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Archivo'; font-weight: 100 900; font-display: swap; src: url('../node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Sora'; font-weight: 100 800; font-display: swap; src: url('../node_modules/@fontsource-variable/sora/files/sora-latin-wght-normal.woff2') format('woff2'); }
+/* Metric-matched fallbacks keep the layout still while the real faces load. */
+@font-face { font-family: 'Inter Fallback'; src: local('Arial'); size-adjust: 107.4%; ascent-override: 90.2%; descent-override: 22.48%; line-gap-override: 0%; }
+@font-face { font-family: 'Baskerville Fallback'; src: local('Georgia'); size-adjust: 114%; ascent-override: 85%; descent-override: 23.5%; line-gap-override: 0%; }
 
-  --font-display: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Inter', -apple-system, 'Segoe UI', Helvetica, sans-serif;
+/* NOXXD: warm stone neutrals, layered surfaces, soft elevation, hairlines.
+   Every colour is a light-dark() pair, so one token set serves both themes. The build lowers
+   light-dark() for older browsers and resolves it where it is declared, so the tokens are
+   re-declared on each scope that flips the scheme (dark band, light plate, lightbox). */
+:root, .band-night, .scope-light, .lightbox {
+  --c-bg: light-dark(#FAFAF9, #141210);
+  --c-surface: light-dark(#F5F5F4, #1C1917);
+  --c-raised: light-dark(#FFFFFF, #221F1C);
+  --c-ink: light-dark(#1C1917, #F5F5F4);
+  --c-text-2: light-dark(#57534E, #B8B2AC);
+  --c-sage: light-dark(#A8A29E, #78716C);
+  --c-stone: light-dark(#78716C, #A8A29E);
+  --c-line: light-dark(#E7E5E4, #2B2724);
+  --c-line-2: light-dark(#D6D3D1, #443E3A);
+  --c-on-accent: light-dark(#FFFFFF, #141210);
+  --p-accent: var(--c-ink);
+  --p-ink: var(--c-ink);
+  --p-tint: var(--c-surface);
+}
+
+/* One muted accent, ink, tint and display face per product: same NOXXD frame, distinct worlds.
+   The dark twin keeps the hue and lifts it for contrast on dark ground. */
+.theme-urbis, .theme-urbis :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#2F6B7C, #7FBBCC); --p-ink: light-dark(#16323B, #E6F1F4); --p-tint: light-dark(#EBF1F2, #15262B); }
+.theme-healthsearch, .theme-healthsearch :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#8A6A2E, #D3AC66); --p-ink: light-dark(#1F2D3D, #F1ECE2); --p-tint: light-dark(#F4EFE6, #262015); }
+.theme-caritas, .theme-caritas :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#52599A, #A6ACE3); --p-ink: light-dark(#1E2238, #ECEDF7); --p-tint: light-dark(#EEEFF6, #1B1D2E); }
+.theme-urbis { --p-font: 'Manrope', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
+.theme-healthsearch { --p-font: 'Archivo', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
+.theme-caritas { --p-font: 'Sora', 'Inter Fallback', sans-serif; --p-weight: 600; --p-tracking: -0.03em; }
+
+@theme {
+  --font-display: 'Libre Baskerville', 'Baskerville Fallback', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', 'Inter Fallback', -apple-system, 'Segoe UI', Helvetica, sans-serif;
   --font-mono: 'Source Code Pro', 'Fira Code', Consolas, monospace;
 
+  /* Fluid type scale: small steps are fixed, reading and display steps grow with the viewport. */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.4;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.55;
+  --text-md: 0.9375rem;
+  --text-md--line-height: 1.6;
+  --text-base: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+  --text-base--line-height: 1.7;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.55;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.35;
+  --text-lead: clamp(1.125rem, 1.05rem + 0.4vw, 1.3125rem);
+  --text-lead--line-height: 1.6;
+  --text-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-h2: clamp(1.875rem, 1.35rem + 2.2vw, 3rem);
+  --text-h2--line-height: 1.1;
+  --text-h1: clamp(2.25rem, 1rem + 6.4vw, 5.5rem);
+  --text-h1--line-height: 1.02;
+  --text-stat: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
+  --text-stat--line-height: 1;
+
+  --spacing-gutter: clamp(1rem, 0.4rem + 3vw, 3rem);
+  --spacing-section: clamp(4rem, 2.4rem + 7vw, 8.5rem);
+  --container-page: 75rem;
+  --container-measure: 42rem;
+
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-1: 0 1px 2px light-dark(rgb(28 25 23 / 0.06), rgb(0 0 0 / 0.4));
+  --shadow-2: 0 2px 4px -1px light-dark(rgb(28 25 23 / 0.06), rgb(0 0 0 / 0.4)), 0 10px 24px -8px light-dark(rgb(28 25 23 / 0.12), rgb(0 0 0 / 0.5));
+  --shadow-3: 0 4px 8px -2px light-dark(rgb(28 25 23 / 0.08), rgb(0 0 0 / 0.45)), 0 28px 56px -16px light-dark(rgb(28 25 23 / 0.22), rgb(0 0 0 / 0.65));
+
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-rise: rise-in var(--dur-3) var(--ease-out-expo) both;
+  --animate-step: u-step 10s var(--ease-out-expo) infinite;
+  --animate-feed: feed-in var(--dur-3) var(--ease-out-expo);
 }
 
 @theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-raised: var(--c-raised);
+  --color-ink: var(--c-ink);
+  --color-text-2: var(--c-text-2);
+  --color-sage: var(--c-sage);
+  --color-stone: var(--c-stone);
+  --color-line: var(--c-line);
+  --color-line-2: var(--c-line-2);
+  --color-on-accent: var(--c-on-accent);
+  --color-scrim: rgb(12 10 9 / 0.82);
   --color-accent: var(--p-accent);
   --color-accent-ink: var(--p-ink);
   --color-tint: var(--p-tint);
@@ -31,123 +112,383 @@
 }
 
 :root {
-  --p-accent: #78716C;
-  --p-ink: #1C1917;
-  --p-tint: #F5F5F4;
+  color-scheme: light dark;
   --p-font: var(--font-display);
+  --p-weight: 400;
+  --p-tracking: -0.015em;
+  --dur-1: 150ms;
+  --dur-2: 300ms;
+  --dur-3: 600ms;
 }
+/* Manual theme choice, set before paint by the inline script in each HTML head. */
+[data-theme='light'] { color-scheme: light; }
+[data-theme='dark'] { color-scheme: dark; }
 
 /* English visitors: the prerendered HTML is Portuguese, so it stays hidden until React renders English. */
 [data-wait] #root { visibility: hidden; }
 
 @layer base {
   html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 84px;
-    scrollbar-color: var(--color-sage) var(--color-bg);
+    scroll-padding-top: 5.5rem;
+    scrollbar-color: var(--c-sage) var(--c-bg);
     scrollbar-width: thin;
+    scrollbar-gutter: stable;
     -webkit-text-size-adjust: 100%;
   }
+  /* Menu or lightbox open: the page behind stays put. */
+  html:has(dialog[open]) { overflow: hidden; }
 
   body {
     min-height: 100dvh;
-    background: var(--color-bg);
-    color: var(--color-ink);
+    background: var(--c-bg);
+    color: var(--c-ink);
     font-family: var(--font-sans);
-    font-size: 1.0625rem;
-    line-height: 1.8;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-feature-settings: 'cv11', 'ss03';
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
     caret-color: var(--p-accent);
   }
 
-  h1, h2, h3 { text-wrap: balance; }
+  h1, h2, h3 { text-wrap: balance; overflow-wrap: break-word; }
   p { text-wrap: pretty; }
 
   ::selection {
     background: var(--p-accent);
-    color: var(--color-bg);
+    color: var(--c-on-accent);
   }
 
   :focus-visible {
-    outline: 2px solid transparent; /* keeps a ring in forced-colors mode */
-    box-shadow: var(--ring, 0 0 0 2px #FAFAF9, 0 0 0 4px var(--p-accent)); /* fallback resolves per element, so it follows each project accent */
+    outline: 2px solid var(--p-accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
   }
 
   a { text-underline-offset: 4px; text-decoration-thickness: 1px; }
 
   kbd {
     padding: 1px 6px;
-    border: 1px solid var(--color-line-2);
-    background: var(--color-bg);
+    border: 1px solid var(--c-line-2);
+    border-bottom-width: 2px;
+    border-radius: var(--radius-sm);
+    background: var(--c-raised);
     font: 500 0.8em/1.4 var(--font-mono);
   }
+
+  dialog { color: inherit; }
 }
 
 @layer components {
-  .wrap { width: min(1080px, 100% - 48px); margin-inline: auto; }
-  @media (max-width: 640px) { .wrap { width: calc(100% - 32px); } }
+  .wrap {
+    width: min(var(--container-page), 100% - 2 * max(var(--spacing-gutter), env(safe-area-inset-left), env(safe-area-inset-right)));
+    margin-inline: auto;
+  }
 
-  .section { padding-block: 60px; }
-  @media (min-width: 701px) { .section { padding-block: 84px; } }
-  @media (min-width: 1025px) { .section { padding-block: 120px; } }
+  .section { padding-block: var(--spacing-section); }
 
   .btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 12px 24px;
+    gap: 0.625rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.5rem;
     border: 1px solid var(--p-accent);
+    border-radius: var(--radius-md);
     background: var(--p-accent);
-    color: var(--color-bg);
-    font: 600 0.9375rem/1.2 var(--font-sans);
+    color: var(--c-on-accent);
+    font: 600 var(--text-md)/1.2 var(--font-sans);
     text-decoration: none;
-    transition: background-color 0.2s var(--ease-out-expo), border-color 0.2s var(--ease-out-expo), color 0.2s var(--ease-out-expo);
+    cursor: pointer;
+    box-shadow: var(--shadow-1);
+    transition: background-color var(--dur-1) var(--ease-out-expo), border-color var(--dur-1) var(--ease-out-expo), color var(--dur-1) var(--ease-out-expo), transform var(--dur-2) var(--ease-out-expo);
   }
-  .btn:hover { background: var(--p-ink); border-color: var(--p-ink); }
-  .btn:active { background: var(--color-stone-active); border-color: var(--color-stone-active); }
-  .btn svg { width: 18px; height: 18px; flex: none; transition: transform 0.3s var(--ease-out-expo); }
+  .btn:hover { background: color-mix(in oklab, var(--p-accent) 86%, var(--c-bg)); border-color: transparent; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0) scale(0.985); }
+  .btn svg { width: 1.125rem; height: 1.125rem; flex: none; transition: transform var(--dur-2) var(--ease-out-expo); }
   .btn:hover svg { transform: translateX(3px); }
 
   .btn-outline {
-    background: transparent;
-    border-color: var(--color-line-2);
-    color: var(--color-stone-hover);
+    background: var(--c-raised);
+    border-color: var(--c-line-2);
+    color: var(--c-ink);
   }
-  .btn-outline:hover { background: var(--color-surface); border-color: var(--color-line-2); color: var(--color-ink); }
-  .btn-outline:active { background: var(--color-line); border-color: var(--color-line-2); }
+  .btn-outline:hover { background: var(--c-surface); border-color: var(--c-sage); }
 
-  @media (max-width: 640px) { .btn { width: 100%; } }
+  @media (max-width: 480px) { .btn { width: 100%; } }
+
+  /* Button whose hit area covers its whole card. It must not move: a transform would shrink that area back to the button. */
+  .btn-cover { position: static; }
+  .btn-cover::after { content: ''; position: absolute; inset: 0; }
+  .btn-cover:hover, .btn-cover:active { transform: none; }
+
+  /* Square 44px control: menu, theme, lightbox arrows. */
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    border: 1px solid var(--c-line-2);
+    border-radius: var(--radius-md);
+    background: var(--c-raised);
+    color: var(--c-ink);
+    cursor: pointer;
+    transition: background-color var(--dur-1) var(--ease-out-expo), transform var(--dur-1) var(--ease-out-expo);
+  }
+  .icon-btn:hover { background: var(--c-surface); }
+  .icon-btn:active { transform: scale(0.94); }
+  .icon-btn svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  .theme-sun { stroke: light-dark(currentColor, transparent); }
+  .theme-moon { stroke: light-dark(transparent, currentColor); }
 
   .text-link {
-    color: var(--color-ink);
-    font-size: 0.9375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--c-ink);
+    font-size: var(--text-md);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: var(--color-line-2);
-    transition: text-decoration-color 0.2s var(--ease-out-expo), color 0.2s var(--ease-out-expo);
+    text-decoration-color: var(--c-line-2);
+    transition: text-decoration-color var(--dur-1) var(--ease-out-expo), color var(--dur-1) var(--ease-out-expo);
   }
-  .text-link:hover { color: var(--p-accent); text-decoration-color: currentColor; }
+  .text-link svg { width: 1rem; height: 1rem; flex: none; transition: transform var(--dur-2) var(--ease-out-expo); }
+  .text-link:hover, .group:hover .text-link { color: var(--p-accent); text-decoration-color: currentColor; }
+  .text-link:hover svg, .group:hover .text-link svg { transform: translateX(4px); }
 
-  .lead { font-size: 1.25rem; line-height: 1.75; color: var(--color-text-2); max-width: 680px; }
+  /* Page display voice: NOXXD serif on the Home, the product face inside a project theme. */
+  .h-display { font-family: var(--p-font); font-weight: var(--p-weight); letter-spacing: var(--p-tracking); color: var(--p-ink); }
+
+  .lead { font-size: var(--text-lead); line-height: var(--text-lead--line-height); color: var(--c-text-2); max-width: var(--container-measure); }
+
+  /* One raised surface: border, radius, soft shadow. Never nested. */
+  .card {
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    background: var(--c-raised);
+    box-shadow: var(--shadow-1);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--p-tint);
+    color: var(--p-ink);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .chip-line { background: transparent; border: 1px solid var(--c-line-2); color: var(--c-text-2); font-weight: 500; font-size: var(--text-xs); }
+
+  /* The logo's checker as a quiet field, fading out from one corner. */
+  .checker { position: relative; isolation: isolate; }
+  .checker::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: conic-gradient(var(--checker, var(--c-line)) 25%, transparent 0 50%, var(--checker, var(--c-line)) 0 75%, transparent 0) top right / 5rem 5rem;
+    mask-image: radial-gradient(110% 95% at 100% 0%, #000 0%, transparent 60%);
+    opacity: 0.6;
+  }
+
+  /* Dark band inside either theme: tokens resolve to their dark values in here. */
+  .band-night { color-scheme: dark; background: #0F0D0C; color: var(--c-ink); --checker: #1F1C19; }
+  /* Light plate inside either theme: product logos and paper sheets keep their contrast. */
+  .scope-light { color-scheme: light; }
+  /* Status colour given as --l / --d (ink on light, ink on dark); the plate is a wash of that ink. */
+  .tone { color: light-dark(var(--l), var(--d)); background: color-mix(in oklab, currentColor 14%, transparent); }
+
+  /* Product hero: the product tint washes down into the page. */
+  .hero-wash { background: linear-gradient(to bottom, var(--p-tint), var(--c-bg)); --checker: color-mix(in oklab, var(--p-accent) 10%, transparent); }
+
+  /* Spotlight card (React Bits pattern): a soft glow follows the pointer, moved with transform only. */
+  .spot { position: relative; isolation: isolate; overflow: hidden; }
+  .spot::after {
+    content: '';
+    position: absolute;
+    top: -15rem;
+    left: -15rem;
+    width: 30rem;
+    height: 30rem;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--p-accent) 16%, transparent), transparent);
+    transform: translate3d(var(--x, 0), var(--y, 0), 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-3) var(--ease-out-expo);
+  }
+  @media (hover: hover) { .spot:hover::after { opacity: 1; } }
+
+  /* Row with a hover plate behind it; the whole row is the link target. */
+  .row { position: relative; isolation: isolate; }
+  .row::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(var(--spacing-gutter) * -0.5);
+    z-index: -1;
+    border-radius: var(--radius-lg);
+    background: var(--c-surface);
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-out-expo);
+  }
+  .row:hover::before, .row:focus-within::before { opacity: 1; }
+
+  /* Sticky header: its backdrop fades in once the page scrolls. */
+  .site-header { position: sticky; top: 0; z-index: 50; view-transition-name: site-header; padding-top: env(safe-area-inset-top); }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-bottom: 1px solid var(--c-line);
+    background: color-mix(in oklab, var(--c-bg) 90%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: var(--shadow-1);
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-out-expo);
+  }
+  .site-header[data-scrolled]::before { opacity: 1; }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    color: var(--c-text-2);
+    font-size: var(--text-md);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color var(--dur-1) var(--ease-out-expo);
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0.75rem 0.5rem;
+    height: 1.5px;
+    background: var(--p-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-2) var(--ease-out-expo);
+  }
+  .nav-link:hover, .nav-link[data-on] { color: var(--c-ink); }
+  .nav-link[data-on]::after { transform: scaleX(1); }
+
+  /* Mobile menu and lightbox are native <dialog>: focus trap, Esc and inert page come from the platform. */
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    background: var(--c-bg);
+    overflow-y: auto;
+  }
+  .lightbox {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    background: transparent;
+    color-scheme: dark;
+    color: var(--c-ink);
+  }
+  .lightbox::backdrop { background: var(--color-scrim); }
+  .menu, .lightbox, .lightbox::backdrop {
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-out-expo), transform var(--dur-2) var(--ease-out-expo), overlay var(--dur-2) allow-discrete, display var(--dur-2) allow-discrete;
+  }
+  .menu { transform: translateY(-1rem); }
+  .lightbox { transform: scale(0.97); }
+  .menu[open], .lightbox[open], .lightbox[open]::backdrop { opacity: 1; transform: none; }
+  @starting-style {
+    .menu[open] { opacity: 0; transform: translateY(-1rem); }
+    .lightbox[open] { opacity: 0; transform: scale(0.97); }
+    .lightbox[open]::backdrop { opacity: 0; }
+  }
+  .menu[open] .menu-link { animation: var(--animate-rise); animation-delay: calc(var(--i) * 50ms + 80ms); }
+
+  /* FAQ on native <details>: the answer eases in when a row opens. */
+  .faq summary { list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq[open] > :not(summary) { animation: faq-in var(--dur-2) var(--ease-out-expo); }
+
+  .shot-zoom { display: block; width: 100%; cursor: zoom-in; text-align: left; }
+  .shot-frame { transition: transform var(--dur-3) var(--ease-out-expo); }
+  @media (hover: hover) { .shot-zoom:hover .shot-frame { transform: translateY(-4px); } }
 }
 
-/* React Bits "Blur Text" pattern: words settle from blur, one at a time. */
-.blur-word {
+/* Hero headline: words rise in one after another. `em` words take the page accent. */
+.rise-word {
   display: inline-block;
-  animation: blur-in 0.9s var(--ease-out-expo) both;
-  animation-delay: calc(var(--i) * 70ms);
+  animation: var(--animate-rise);
+  animation-delay: calc(var(--i) * 60ms);
 }
-@keyframes blur-in {
-  from { opacity: 0; filter: blur(10px); transform: translateY(6px); }
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(0.35em); }
 }
 
-/* React Bits "Logo Loop" pattern: two identical tracks slide forever. */
+/* Home hero: the emblem assembles square by square. */
+.build rect, .build path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: build-in var(--dur-3) var(--ease-out-expo) both;
+  animation-delay: calc(var(--i) * 26ms + 200ms);
+}
+@keyframes build-in {
+  from { opacity: 0; transform: translateY(-0.5rem) scale(0.2); }
+}
+
+@keyframes faq-in {
+  from { opacity: 0; transform: translateY(-0.375rem); }
+}
+
+/* React Bits "Logo Loop" pattern: two identical tracks slide forever; hover or focus pauses them. */
 .loop { display: flex; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .loop__track { display: flex; flex: none; animation: loop var(--loop-speed, 48s) linear infinite; }
+.loop:hover .loop__track, .loop:focus-within .loop__track { animation-play-state: paused; }
 @keyframes loop { to { transform: translate3d(-100%, 0, 0); } }
+
+/* Scroll reveal. Content is visible by default; ui.jsx sets [data-motion] only after it has marked
+   what is already on screen, so nothing flashes and nothing depends on JS to be readable. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  @view-transition { navigation: auto; }
+
+  [data-motion] [data-reveal]:not([data-in]),
+  [data-motion] [data-stagger]:not([data-in]) > * {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  [data-reveal][data-in],
+  [data-stagger][data-in] > * {
+    transition: opacity var(--dur-3) var(--ease-out-expo), transform var(--dur-3) var(--ease-out-expo);
+  }
+  [data-stagger][data-in] > :nth-child(2) { transition-delay: 70ms; }
+  [data-stagger][data-in] > :nth-child(3) { transition-delay: 140ms; }
+  [data-stagger][data-in] > :nth-child(4) { transition-delay: 210ms; }
+  [data-stagger][data-in] > :nth-child(5) { transition-delay: 280ms; }
+  [data-stagger][data-in] > :nth-child(n + 6) { transition-delay: 350ms; }
+}
+
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-2); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -156,6 +497,7 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
   .loop { mask-image: none; flex-wrap: wrap; }
   .loop__track { flex-wrap: wrap; }
   .loop__track[aria-hidden] { display: none; }
@@ -163,8 +505,8 @@
 
 /* Urbis status ribbon: each badge steps up in turn. */
 @keyframes u-step {
-  0%, 22%, 100% { transform: none; box-shadow: 0 0 0 0 transparent; }
-  6%, 16% { transform: translateY(-3px); box-shadow: 0 0 0 1px currentColor; }
+  0%, 22%, 100% { transform: none; }
+  6%, 16% { transform: translateY(-3px); }
 }
 
 /* HealthSearch alert feed: the newest alert slides in on top. */

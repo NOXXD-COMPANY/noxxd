@@ -2,12 +2,14 @@
 <html lang="pt-BR" data-title-en="NOXXD — Technology Built Your Way | BUILD IT YOUR WAY">
 <head>
   <meta charset="UTF-8">
-  <script>try{localStorage.getItem('noxxd_lang')==='en'&&document.documentElement.setAttribute('data-wait','')}catch(e){}</script>
+  <script>try{var d=document.documentElement,s=localStorage,t=s.getItem('noxxd_theme');s.getItem('noxxd_lang')==='en'&&d.setAttribute('data-wait','');(t==='dark'||t==='light')&&d.setAttribute('data-theme',t)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NOXXD — Tecnologia Feita do Seu Jeito | CONSTRUA DO SEU JEITO</title>
   <meta name="description" content="A NOXXD desenvolve sites modernos, landing pages de alta conversão, sistemas web e SaaS sob medida para empresas e setor público.">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#FAFAF9">
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
 
   <meta property="og:title" content="NOXXD — Tecnologia Feita do Seu Jeito | CONSTRUA DO SEU JEITO">
   <meta property="og:description" content="A NOXXD desenvolve sites modernos, landing pages de alta conversão, sistemas web e SaaS sob medida para empresas e setor público.">
@@ -18,10 +20,6 @@
 
   <link rel="canonical" href="https://noxxd.com.br/">
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Baskerville:wght@400;700&family=Source+Code+Pro:wght@400&family=Manrope:wght@700&family=Archivo:wght@700&family=Sora:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="root"></div>
