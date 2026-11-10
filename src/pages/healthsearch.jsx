@@ -24,10 +24,10 @@ function Matrix() {
     ['late', t('Vencido', 'Expired'), C.late],
   ]
   return (
-    <figure className="border border-line-2 bg-bg p-5 md:p-6" aria-labelledby="matrix-cap">
+    <figure className="card p-5 md:p-6" aria-labelledby="matrix-cap">
       <figcaption className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <strong id="matrix-cap" className="font-product text-accent-ink"><T pt="Matriz de treinamentos" en="Training matrix" /></strong>
-        <span className="font-mono text-[0.8125rem] whitespace-nowrap text-text-2">NR-01 — NR-35</span>
+        <strong id="matrix-cap" className="h-display"><T pt="Matriz de treinamentos" en="Training matrix" /></strong>
+        <span className="font-mono text-xs whitespace-nowrap text-text-2">NR-01 — NR-35</span>
       </figcaption>
       <p className="sr-only">
         <T pt="Demonstração: 30 normas em dia; NR-06, NR-12 e NR-33 a vencer; NR-18 e NR-35 vencidas." en="Demo: 30 standards up to date; NR-06, NR-12 and NR-33 due soon; NR-18 and NR-35 expired." />
@@ -36,9 +36,9 @@ function Matrix() {
         {NRS.map(({ n, status }) => (
           <li
             key={n}
-            className="grid aspect-square place-items-center font-mono text-[0.8125rem] transition-opacity duration-300"
+            className={`grid aspect-square place-items-center rounded-sm font-mono text-xs transition-opacity duration-(--dur-2) ${status === 'ok' ? 'tone' : 'text-white'}`}
             // only exceptions are solid; compliant standards stay a quiet tint
-            style={{ background: status === 'ok' ? '#E6EDE4' : C[status], color: status === 'ok' ? '#3D5F39' : '#FFFFFF', opacity: show === 'all' || show === status ? 1 : 0.15 }}
+            style={{ '--l': '#3D5F39', '--d': '#A9CDA3', background: status === 'ok' ? undefined : C[status], opacity: show === 'all' || show === status ? 1 : 0.15 }}
           >
             {n}
           </li>
@@ -51,15 +51,15 @@ function Matrix() {
             type="button"
             aria-pressed={show === key}
             onClick={() => setShow(key)}
-            className={`inline-flex min-h-9 cursor-pointer items-center gap-2 border px-3 text-[0.8125rem] font-semibold transition-colors ${
+            className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-xs font-semibold transition-colors duration-(--dur-1) ${
               show === key ? 'border-ink bg-ink text-bg' : 'border-line-2 text-text-2 hover:text-ink'
             }`}
           >
-            <i aria-hidden="true" className="size-2" style={{ background: color }} />
+            <i aria-hidden="true" className="size-2 rounded-xs" style={{ background: color }} />
             {label}
           </button>
         ))}
-        <em className="ml-auto text-[0.8125rem] text-text-2 not-italic"><T pt="Dados ilustrativos" en="Illustrative data" /></em>
+        <em className="ml-auto text-xs text-text-2 not-italic"><T pt="Dados ilustrativos" en="Illustrative data" /></em>
       </div>
     </figure>
   )
@@ -81,12 +81,12 @@ function Feed({ items }) {
         return (
           <li
             key={i}
-            className={`grid grid-cols-[10px_1fr] gap-4 border-b border-line bg-bg py-4 ${pos === 0 && !reduced ? 'animate-[feed-in_0.6s_var(--ease-out-expo)]' : ''}`}
+            className={`grid grid-cols-[10px_1fr] gap-4 border-b border-line bg-bg py-4 ${pos === 0 && !reduced ? 'animate-feed' : ''}`}
           >
             <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: color }} />
             <span>
               <strong className="block font-semibold text-ink">{title}</strong>
-              <small className="text-[0.875rem] text-text-2">{detail}</small>
+              <small className="text-sm text-text-2">{detail}</small>
             </span>
           </li>
         )
@@ -115,7 +115,7 @@ function Palette({ items }) {
   const q = norm(query.trim())
   const hits = items.filter(([title, detail]) => !q || norm(`${title} ${detail}`).includes(q))
   return (
-    <div className="border border-line-2 bg-bg">
+    <div className="card overflow-hidden">
       <label className="flex items-center gap-3 border-b border-line px-4">
         <svg viewBox="0 0 24 24" className="size-5 flex-none text-text-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden="true">
           <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
@@ -128,7 +128,7 @@ function Palette({ items }) {
           onChange={(event) => setQuery(event.target.value)}
           placeholder={t('Beatriz, NR-35, clínica…', 'Beatriz, NR-35, clinic…')}
           autoComplete="off"
-          className="min-h-14 w-full bg-transparent text-[1rem] text-ink outline-none placeholder:text-text-2"
+          className="min-h-14 w-full bg-transparent text-base text-ink -outline-offset-2 placeholder:text-text-2"
         />
       </label>
       <ul aria-label={t('Resultados', 'Results')}>
@@ -136,15 +136,15 @@ function Palette({ items }) {
           <li key={title} className="grid grid-cols-[10px_1fr] gap-4 border-b border-line px-4 py-3 last:border-b-0">
             <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: color }} />
             <span>
-              <strong className="block text-[0.9375rem] font-semibold text-ink">{title}</strong>
-              <small className="text-[0.8125rem] text-text-2">{detail}</small>
+              <strong className="block text-md font-semibold text-ink">{title}</strong>
+              <small className="text-xs text-text-2">{detail}</small>
             </span>
           </li>
         ))}
       </ul>
       <p className="sr-only" aria-live="polite">{t(`${hits.length} resultado${hits.length === 1 ? '' : 's'}`, `${hits.length} result${hits.length === 1 ? '' : 's'}`)}</p>
-      {!hits.length && <p className="px-4 py-6 text-[0.9375rem] text-text-2"><T pt="Nada encontrado nos dados de demonstração." en="Nothing found in the demo data." /></p>}
-      <p className="flex justify-between border-t border-line bg-surface px-4 py-2 text-[0.8125rem] text-text-2">
+      {!hits.length && <p className="px-4 py-6 text-md text-text-2"><T pt="Nada encontrado nos dados de demonstração." en="Nothing found in the demo data." /></p>}
+      <p className="flex justify-between border-t border-line bg-surface px-4 py-2 text-xs text-text-2">
         <span><kbd>Ctrl</kbd> + <kbd>K</kbd></span>
         <T pt="Dados fictícios" en="Demo data" />
       </p>
@@ -184,7 +184,7 @@ function HealthSearch() {
               <div key={title} className="grid grid-cols-[12px_1fr] gap-4">
                 <i aria-hidden="true" className="mt-2 size-3" style={{ background: color }} />
                 <div>
-                  <p className="font-product text-[1.2rem] font-bold text-accent-ink">{title}</p>
+                  <p className="h-display text-xl">{title}</p>
                   <p className="text-text-2">{text}</p>
                 </div>
               </div>
@@ -195,7 +195,7 @@ function HealthSearch() {
       </Hero>
 
       <section className="section border-t border-line" aria-labelledby="cycle-title">
-        <div className="wrap">
+        <div data-reveal className="wrap">
           <H2 id="cycle-title">{t('O ciclo do ASO, de ponta a ponta (NR-07)', 'The full medical-exam cycle (NR-07)')}</H2>
           <p className="lead mt-6">
             <T
@@ -203,7 +203,7 @@ function HealthSearch() {
               en="Every employee has a clear state on every screen: profile, complementary exams and analytics share the same color language."
             />
           </p>
-          <ol className="mt-12 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
+          <ol className="mt-12 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6" data-stagger>
             {[
               [t('Solicitado', 'Requested'), t('Guia de encaminhamento gerada no sistema.', 'Referral form generated in the system.'), C.requested],
               [t('Agendado', 'Scheduled'), t('Consulta marcada em clínica credenciada.', 'Appointment booked at an accredited clinic.'), C.booked],
@@ -213,8 +213,8 @@ function HealthSearch() {
               [t('Vencido', 'Expired'), t('Prioridade imediata.', 'Immediate priority.'), C.late],
             ].map(([title, text, color]) => (
               <li key={title} className="border-t-2 pt-4" style={{ borderColor: color }}>
-                <strong className="block font-product text-accent-ink">{title}</strong>
-                <span className="text-[0.9375rem] text-text-2">{text}</span>
+                <strong className="block h-display">{title}</strong>
+                <span className="text-md text-text-2">{text}</span>
               </li>
             ))}
           </ol>
@@ -240,7 +240,7 @@ function HealthSearch() {
       />
 
       <section className="section" aria-labelledby="feed-title">
-        <div className="wrap grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
+        <div data-stagger className="wrap grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
           <div>
             <H2 id="feed-title">{t('O alerta chega antes do vencimento', 'The alert arrives before the deadline')}</H2>
             <p className="lead mt-6">
@@ -249,7 +249,7 @@ function HealthSearch() {
                 en="Exams, training and referrals change state and reach the OHS team right away, in traffic-light colour."
               />
             </p>
-            <p className="mt-4 text-[0.875rem] text-text-2"><T pt="Dados fictícios" en="Demo data" /></p>
+            <p className="mt-4 text-sm text-text-2"><T pt="Dados fictícios" en="Demo data" /></p>
           </div>
           <Feed
             items={[
@@ -264,7 +264,7 @@ function HealthSearch() {
       </section>
 
       <section id="modulos" className="section border-t border-line" aria-labelledby="mod-title">
-        <div className="wrap">
+        <div data-reveal className="wrap">
           <H2 id="mod-title">{t('Uma central para toda a operação de SST', 'One hub for the whole OHS operation')}</H2>
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
             <Shot
@@ -283,7 +283,7 @@ function HealthSearch() {
                 [t('Busca global HealthSearch', 'HealthSearch global search'), <>{t('Colaboradores, exames e clínicas em uma janela acionada por', 'Employees, exams and clinics in one window opened with')} {kbd}{t(', de qualquer tela.', ', from any screen.')}</>],
               ].map(([dt, dd]) => (
                 <div key={dt} className="border-b border-line py-5">
-                  <dt className="font-product text-[1.125rem] font-bold text-accent-ink">{dt}</dt>
+                  <dt className="h-display text-lg">{dt}</dt>
                   <dd className="mt-1 text-text-2">{dd}</dd>
                 </div>
               ))}
@@ -293,7 +293,7 @@ function HealthSearch() {
       </section>
 
       <section className="section border-t border-line bg-surface" aria-labelledby="pal-title">
-        <div className="wrap grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
+        <div data-stagger className="wrap grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
           <div>
             <H2 id="pal-title">{t('Experimente a busca global', 'Try the global search')}</H2>
             <p className="lead mt-6">
@@ -314,7 +314,7 @@ function HealthSearch() {
       </section>
 
       <section className="section border-t border-line" aria-labelledby="crypto-title">
-        <div className="wrap grid items-center gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
+        <div data-stagger className="wrap grid items-center gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
           <div>
             <H2 id="crypto-title">{t('O CID-10 é cifrado antes de sair do navegador', 'ICD-10 codes are encrypted before they leave the browser')}</H2>
             <p className="lead mt-6">
@@ -332,25 +332,25 @@ function HealthSearch() {
               ]}
             />
           </div>
-          <div className="border border-line-2 bg-surface p-6 font-mono text-[0.875rem] md:p-8">
-            <p className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Campo no formulário" en="Form field" /></p>
-            <p className="mt-2 border border-line bg-bg px-4 py-3 text-ink">cid10: "M54.5"</p>
+          <div className="card p-6 font-mono text-sm md:p-8">
+            <p className="font-sans text-xs font-semibold text-text-2"><T pt="Campo no formulário" en="Form field" /></p>
+            <p className="mt-2 rounded-sm bg-surface px-4 py-3 text-ink">cid10: "M54.5"</p>
             <p className="my-5 flex items-center gap-3 text-accent">
               <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
               AES-GCM · 256 bits
               <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
             </p>
-            <p className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Gravado no banco" en="Stored in the database" /></p>
-            <p className="mt-2 border border-line bg-bg px-4 py-3 break-all text-ink">
+            <p className="font-sans text-xs font-semibold text-text-2"><T pt="Gravado no banco" en="Stored in the database" /></p>
+            <p className="mt-2 rounded-sm bg-surface px-4 py-3 break-all text-ink">
               iv: "q3Z9rT0bWm1xYc2K"<br />ct: "8fJ2pL0vQe7nR4sT1wXk9uZb6yHc3mAd"
             </p>
-            <p className="mt-4 font-sans text-[0.8125rem] text-text-2"><T pt="Valores ilustrativos." en="Illustrative values." /></p>
+            <p className="mt-4 font-sans text-xs text-text-2"><T pt="Valores ilustrativos." en="Illustrative values." /></p>
           </div>
         </div>
       </section>
 
       <section className="section border-t border-line" aria-labelledby="stack-title">
-        <div className="wrap">
+        <div data-reveal className="wrap">
           <H2 id="stack-title">{t('Arquitetura de custo zero', 'Zero-cost architecture')}</H2>
           <p className="lead mt-6">
             <T
@@ -358,7 +358,7 @@ function HealthSearch() {
               en="A client-centric SPA running on serverless infrastructure, with no dedicated server to maintain and no data-egress fees."
             />
           </p>
-          <dl className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
             {[
               ['React 19', '+ Vite 8', t('Rotas com React Router 7, cache com TanStack Query e carregamento sob demanda com retry.', 'React Router 7 routes, TanStack Query caching and lazy loading with retry.')],
               ['Tailwind v4', 'CSS-first @theme', t('Tokens de marca e semáforo SST declarados direto no CSS, sem config em JavaScript.', 'Brand and OHS status tokens declared straight in CSS, no JavaScript config.')],
@@ -367,14 +367,14 @@ function HealthSearch() {
             ].map(([name, sub, text]) => (
               <div key={name} className="border-t border-accent pt-5">
                 <dt>
-                  <b className="font-product text-[1.25rem] text-accent-ink">{name}</b>
-                  <small className="ml-2 font-mono text-[0.8125rem] text-text-2">{sub}</small>
+                  <b className="font-product text-xl text-accent-ink">{name}</b>
+                  <small className="ml-2 font-mono text-xs text-text-2">{sub}</small>
                 </dt>
-                <dd className="mt-2 text-[0.9375rem] text-text-2">{text}</dd>
+                <dd className="mt-2 text-md text-text-2">{text}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-10 max-w-[70ch] text-[0.9375rem] text-text-2">
+          <p className="mt-10 max-w-[70ch] text-md text-text-2">
             <T
               pt="Interface com zero emojis, ícones Heroicons e alto contraste estrito (anti-washout) em conformidade com WCAG AA."
               en="An interface with zero emojis, Heroicons iconography and strict anti-washout high contrast to WCAG AA."

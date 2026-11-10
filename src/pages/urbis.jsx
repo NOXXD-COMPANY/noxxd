@@ -3,24 +3,24 @@ import { T, useLang } from '../lang.jsx'
 import { Faq, Loop, Shot } from '../ui.jsx'
 import { Close, Facts, H2, Hero, Points, ProjectPage } from '../project.jsx'
 
-// Report statuses from the product, muted: [pt, en, background, ink]
+// Report statuses from the product, muted: [pt, en, ink on light, ink on dark], painted by .tone
 const STATUS = {
-  pendente: ['Pendente', 'Pending', '#F6E3E0', '#8E3B32'],
-  analise: ['Em Análise', 'Under Review', '#F4ECD8', '#6E5114'],
-  andamento: ['Em Andamento', 'In Progress', '#E3EEF1', '#2F6B7C'],
-  resolvido: ['Resolvido', 'Resolved', '#E3EDE0', '#3F6B35'],
-  rejeitado: ['Rejeitado', 'Rejected', '#EDEBE9', '#57534E'],
+  pendente: ['Pendente', 'Pending', '#8E3B32', '#E8A097'],
+  analise: ['Em Análise', 'Under Review', '#6E5114', '#DDBE78'],
+  andamento: ['Em Andamento', 'In Progress', '#2F6B7C', '#7FBBCC'],
+  resolvido: ['Resolvido', 'Resolved', '#3F6B35', '#9CCB90'],
+  rejeitado: ['Rejeitado', 'Rejected', '#57534E', '#B8B2AC'],
 }
 
 function Badge({ status, step }) {
   const { t } = useLang()
-  const [pt, en, bg, fg] = STATUS[status]
+  const [pt, en, light, dark] = STATUS[status]
   return (
     <span
-      className={`inline-flex items-center gap-2 px-3.5 py-2 text-[0.875rem] font-bold whitespace-nowrap ${step !== undefined ? 'animate-[u-step_10s_var(--ease-out-expo)_infinite]' : ''}`}
-      style={{ background: bg, color: fg, animationDelay: `${(step || 0) * 2.5}s` }}
+      className={`tone inline-flex items-center gap-2 rounded-sm px-3.5 py-2 text-sm font-bold whitespace-nowrap ${step !== undefined ? 'animate-step' : ''}`}
+      style={{ '--l': light, '--d': dark, animationDelay: `${(step || 0) * 2.5}s` }}
     >
-      <i aria-hidden="true" className="size-2 bg-current" />
+      <i aria-hidden="true" className="size-2 rounded-xs bg-current" />
       {t(pt, en)}
     </span>
   )
@@ -55,7 +55,7 @@ function Urbis() {
         secondary={['#frentes', t('Ver os dois front-ends', 'See both front-ends')]}
       >
         <div className="mt-16 border-t border-line pt-6">
-          <p className="mb-4 text-[0.875rem] font-semibold text-text-2"><T pt="Ciclo de vida de cada ocorrência" en="Lifecycle of every report" /></p>
+          <p className="mb-4 text-sm font-semibold text-text-2"><T pt="Ciclo de vida de cada ocorrência" en="Lifecycle of every report" /></p>
           <ol className="flex flex-wrap items-center gap-2.5">
             {['pendente', 'analise', 'andamento', 'resolvido'].map((s, i) => (
               <li key={s} className="flex items-center gap-2.5">
@@ -63,11 +63,11 @@ function Urbis() {
                 <Badge status={s} step={i} />
               </li>
             ))}
-            <li className="flex items-center gap-2.5 text-[0.875rem] text-text-2 sm:ml-4 sm:border-l sm:border-line-2 sm:pl-5">
+            <li className="flex items-center gap-2.5 text-sm text-text-2 sm:ml-4 sm:border-l sm:border-line-2 sm:pl-5">
               <T pt="ou" en="or" /> <Badge status="rejeitado" />
             </li>
           </ol>
-          <p className="mt-4 max-w-[70ch] text-[0.9375rem] text-text-2">
+          <p className="mt-4 max-w-[70ch] text-md text-text-2">
             <T
               pt="Toda mudança de status exige justificativa técnica do servidor e entra no histórico auditável, usado por Tribunal de Contas e Ouvidoria."
               en="Every status change requires a written technical justification and is stored in an auditable history used by audit courts and the ombudsman."
@@ -77,7 +77,7 @@ function Urbis() {
       </Hero>
 
       <section id="frentes" className="section border-t border-line" aria-label={t('Os dois front-ends', 'The two front-ends')}>
-        <div className="wrap grid gap-16 md:grid-cols-[minmax(240px,0.42fr)_1fr] md:gap-x-16">
+        <div data-stagger className="wrap grid gap-16 md:grid-cols-[minmax(240px,0.42fr)_1fr] md:gap-x-16">
           <Shot
             phone
             eager
@@ -99,7 +99,7 @@ function Urbis() {
           />
           <article className="order-2 md:order-none">
             <H2>{t('App do Cidadão', 'Citizen App')}</H2>
-            <p className="mt-2 font-mono text-[0.875rem] text-accent">React Native 0.81 · Expo SDK 54 · TypeScript</p>
+            <p className="mt-2 font-mono text-sm text-accent">React Native 0.81 · Expo SDK 54 · TypeScript</p>
             <p className="mt-4 text-text-2"><T pt="Simples, nativo e pensado para quem nunca abriu um protocolo na vida." en="Simple, native and designed for people who have never filed a city request before." /></p>
             <Points
               className="mt-6"
@@ -113,7 +113,7 @@ function Urbis() {
           </article>
           <article className="order-4 md:order-none">
             <H2>{t('Painel Web da Prefeitura', 'City Hall Web Dashboard')}</H2>
-            <p className="mt-2 font-mono text-[0.875rem] text-accent">Next.js 14 · Tailwind CSS · React Leaflet + leaflet.heat · Recharts</p>
+            <p className="mt-2 font-mono text-sm text-accent">Next.js 14 · Tailwind CSS · React Leaflet + leaflet.heat · Recharts</p>
             <p className="mt-4 text-text-2"><T pt="A mesa de despacho da zeladoria: triagem, moderação e decisão com base em dados." en="The maintenance dispatch desk: triage, moderation and data-driven decisions." /></p>
             <Points
               className="mt-6"
@@ -141,10 +141,10 @@ function Urbis() {
         <Loop
           label={t('Categorias de ocorrência', 'Report categories')}
           speed="40s"
-          itemClass="mr-3 inline-flex items-center gap-2.5 border border-line-2 bg-bg px-4 py-2 text-[0.9375rem] font-semibold whitespace-nowrap"
+          itemClass="mr-3 inline-flex items-center gap-2.5 rounded-md border border-line-2 bg-raised px-4 py-2 text-md font-semibold whitespace-nowrap"
           items={CATEGORIES.map(([pt, en, dot]) => (
             <>
-              <i aria-hidden="true" className="size-2" style={{ background: dot }} />
+              <i aria-hidden="true" className="size-2 rounded-xs" style={{ background: dot }} />
               {t(pt, en)}
             </>
           ))}
@@ -152,7 +152,7 @@ function Urbis() {
       </div>
 
       <section className="section" aria-labelledby="flow-title">
-        <div className="wrap">
+        <div data-reveal className="wrap">
           <H2 id="flow-title">{t('Do buraco na rua ao serviço executado', 'From pothole to completed service')}</H2>
           <p className="lead mt-6">
             <T
@@ -160,27 +160,27 @@ function Urbis() {
               en="Reporting takes three short steps, with 60 fps transitions and assisted validation, designed to work even on a weak signal."
             />
           </p>
-          <ol className="mt-14 grid gap-10 md:grid-cols-[1fr_1.35fr_1fr_auto] md:gap-10">
+          <ol className="mt-14 grid gap-10 md:grid-cols-[1fr_1.35fr_1fr_auto] md:gap-10" data-stagger>
             {[
               [t('Categoria', 'Category'), t('Iluminação, buraco, lixo, vazamento: as categorias vêm do banco de cada município, sem reescrever código.', "Lighting, potholes, waste, leaks: categories load from each city's database, with no code changes.")],
               [t('Evidências', 'Evidence'), t('Câmera nativa com redimensionamento antes do upload, nota de voz com pulso visual e coordenadas convertidas em rua e bairro.', 'Native camera with pre-upload resizing, a voice note with a visual pulse, and coordinates converted to street and district.')],
               [t('Confirmação', 'Confirmation'), t('Revisão, descrição complementar e envio. O cidadão acompanha cada mudança de status na aba Monitorar.', 'Review, extra description and submit. Citizens follow every status change in the Monitor tab.')],
             ].map(([title, text], i) => (
               <li key={i} className="border-t border-accent pt-5">
-                <span className="font-mono text-[0.875rem] text-accent">0{i + 1}</span>
-                <h3 className="mt-2 font-product text-[1.3rem] font-bold text-accent-ink">{title}</h3>
+                <span className="font-mono text-sm text-accent">0{i + 1}</span>
+                <h3 className="mt-2 h-display text-xl">{title}</h3>
                 <p className="mt-2 text-text-2">{text}</p>
                 {i === 1 && (
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {[t('Até 3 fotos', 'Up to 3 photos'), t('Nota de voz', 'Voice note'), t('GPS exato', 'Exact GPS')].map((e) => (
-                      <li key={e} className="bg-tint px-3 py-1.5 text-[0.875rem] font-semibold text-accent-ink">{e}</li>
+                      <li key={e} className="chip">{e}</li>
                     ))}
                   </ul>
                 )}
               </li>
             ))}
             <li className="border-t border-line-2 pt-5">
-              <p className="mb-3 text-[0.9375rem] text-text-2"><T pt="Chega ao painel como" en="Lands on the dashboard as" /></p>
+              <p className="mb-3 text-md text-text-2"><T pt="Chega ao painel como" en="Lands on the dashboard as" /></p>
               <Badge status="pendente" />
             </li>
           </ol>
@@ -188,7 +188,7 @@ function Urbis() {
       </section>
 
       <section className="section border-t border-line bg-surface" aria-labelledby="cmd-title">
-        <div className="wrap grid items-center gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
+        <div data-stagger className="wrap grid items-center gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
           <div>
             <H2 id="cmd-title">{t('Centro de comando geoespacial', 'Geospatial command center')}</H2>
             <p className="lead mt-6">
@@ -201,7 +201,7 @@ function Urbis() {
                 [t('Tabela gerencial', 'Management table'), t('Busca e filtros dinâmicos para triagem e despacho das equipes de campo.', 'Search and dynamic filters for triage and field-crew dispatch.')],
               ].map(([dt, dd]) => (
                 <div key={dt} className="border-b border-line-2 py-4">
-                  <dt className="font-product font-bold text-accent-ink">{dt}</dt>
+                  <dt className="h-display">{dt}</dt>
                   <dd className="text-text-2">{dd}</dd>
                 </div>
               ))}
@@ -219,10 +219,10 @@ function Urbis() {
       </section>
 
       <section className="section border-t border-line" aria-labelledby="trust-title">
-        <div className="wrap grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-24">
+        <div data-stagger className="wrap grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-24">
           <div>
             <H2 id="trust-title">{t('Governo digital, dentro da lei', 'Digital government, by the book')}</H2>
-            <p className="mt-7 mb-3 font-product text-[clamp(2.4rem,5vw,4rem)] leading-none font-bold tracking-[-0.04em] text-accent">Lei 14.129/2021</p>
+            <p className="h-display mt-7 mb-3 text-stat text-accent">Lei 14.129/2021</p>
             <p className="text-text-2">
               <T
                 pt="Construído sobre o Marco Legal do Governo Digital e a LGPD, e pronto para ser licenciado a novos municípios."
@@ -238,7 +238,7 @@ function Urbis() {
               [t('Inclusão', 'Inclusion'), t('Leitores de tela, alto contraste e máscaras de CPF, RG e telefone que evitam erros.', 'Screen readers, high contrast, and input masks for ID and phone numbers that prevent mistakes.')],
             ].map(([dt, dd]) => (
               <div key={dt} className="grid gap-2 border-b border-line py-5 sm:grid-cols-[160px_1fr] sm:gap-6">
-                <dt className="font-product font-bold text-accent-ink">{dt}</dt>
+                <dt className="h-display">{dt}</dt>
                 <dd className="text-text-2">{dd}</dd>
               </div>
             ))}
