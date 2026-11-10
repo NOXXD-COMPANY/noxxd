@@ -40,3 +40,20 @@ test('pages keep the custom domain, canonical URL and English title', () => {
   }
 })
 
+
+test('every screenshot has its half-width "-sm" twin for srcset', () => {
+  for (const slug of ['urbis', 'healthsearch', 'caritas']) {
+    const dir = join(root, 'public/assets/projetos', slug, 'screens')
+    for (const file of readdirSync(dir).filter((f) => !f.endsWith('-sm.webp'))) {
+      assert.ok(existsSync(join(dir, file.replace('.webp', '-sm.webp'))), `${slug}/${file} lacks a -sm twin`)
+    }
+  }
+})
+
+test('pages set the saved theme before paint and load no third-party fonts', () => {
+  for (const file of sources.filter((f) => f.endsWith('.html'))) {
+    const html = read(file)
+    assert.match(html, /getItem\('noxxd_theme'\)/, `${file} lacks the theme pre-paint guard`)
+    assert.doesNotMatch(html, /fonts\.googleapis\.com/, `${file} still loads Google Fonts`)
+  }
+})
