@@ -36,8 +36,8 @@
 .theme-urbis, .theme-urbis :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#2F6B7C, #7FBBCC); --p-ink: light-dark(#16323B, #E6F1F4); --p-tint: light-dark(#EBF1F2, #15262B); }
 .theme-sigac, .theme-sigac :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#8A6A2E, #D3AC66); --p-ink: light-dark(#1F2D3D, #F1ECE2); --p-tint: light-dark(#F4EFE6, #262015); }
 .theme-caritas, .theme-caritas :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#52599A, #A6ACE3); --p-ink: light-dark(#1E2238, #ECEDF7); --p-tint: light-dark(#EEEFF6, #1B1D2E); }
-.theme-urbis { --p-font: 'Manrope', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
-.theme-sigac { --p-font: 'Archivo', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
+.theme-urbis { --p-font: 'Manrope', 'Inter Fallback', sans-serif; --p-weight: 600; --p-tracking: -0.03em; }
+.theme-sigac { --p-font: 'Archivo', 'Inter Fallback', sans-serif; --p-weight: 600; --p-tracking: -0.03em; }
 .theme-caritas { --p-font: 'Sora', 'Inter Fallback', sans-serif; --p-weight: 600; --p-tracking: -0.03em; }
 
 @theme {
@@ -89,7 +89,6 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
   --animate-rise: rise-in var(--dur-3) var(--ease-out-expo) both;
-  --animate-step: u-step 10s var(--ease-out-expo) infinite;
   --animate-feed: feed-in var(--dur-3) var(--ease-out-expo);
 }
 
@@ -494,11 +493,6 @@
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
-/* Urbis status ribbon: each badge steps up in turn. */
-@keyframes u-step {
-  0%, 22%, 100% { transform: none; }
-  6%, 16% { transform: translateY(-3px); }
-}
 
 /* SIGAC alert feed: a state that just changed slides in. */
 @keyframes feed-in {

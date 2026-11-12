@@ -76,10 +76,10 @@ function Feed({ items }) {
     : t(`Vence em ${days} dia${days === 1 ? '' : 's'} · Metalúrgica Vale Azul`, `Due in ${days} day${days === 1 ? '' : 's'} · Metalúrgica Vale Azul`)
   return (
     <div>
-      <label className="block border border-line-2 bg-bg p-5">
+      <label className="card block p-5">
         <span className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <span className="font-semibold text-ink"><T pt="Dias até o vencimento do ASO" en="Days until the exam expires" /></span>
-          <output className="font-product text-[1.75rem] leading-none font-bold text-accent-ink tabular-nums">{days}</output>
+          <output className="font-product text-h3 leading-none font-semibold text-accent-ink tabular-nums">{days}</output>
         </span>
         <input
           type="range"
@@ -91,7 +91,7 @@ function Feed({ items }) {
           className="range mt-4 w-full"
           style={{ '--range': C[state] }}
         />
-        <span className="mt-2 flex justify-between text-[0.8125rem] text-text-2" aria-hidden="true">
+        <span className="mt-2 flex justify-between text-xs text-text-2" aria-hidden="true">
           <span><T pt="Vencido" en="Expired" /></span>
           <span><T pt="janela de 30 dias" en="30-day window" /></span>
           <span><T pt="Em dia" en="Up to date" /></span>
@@ -102,16 +102,16 @@ function Feed({ items }) {
           <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: C[state] }} />
           <span>
             <strong className="block font-semibold text-ink"><T pt="ASO periódico" en="Periodic exam" /> · Igor Batista</strong>
-            <small className="text-[0.875rem] text-text-2">{detail}</small>
+            <small className="text-sm text-text-2">{detail}</small>
           </span>
-          <b className="px-2.5 py-1 text-[0.8125rem] whitespace-nowrap text-white" style={{ background: C[state] }}>{label}</b>
+          <b className="px-2.5 py-1 text-xs whitespace-nowrap text-white" style={{ background: C[state] }}>{label}</b>
         </li>
         {items.map(([title, detail, color]) => (
           <li key={title} className="grid grid-cols-[10px_1fr] gap-4 border-b border-line py-4">
             <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: color }} />
             <span>
               <strong className="block font-semibold text-ink">{title}</strong>
-              <small className="text-[0.875rem] text-text-2">{detail}</small>
+              <small className="text-sm text-text-2">{detail}</small>
             </span>
           </li>
         ))}
@@ -143,10 +143,10 @@ function Cipher() {
     }
   }, [code])
   return (
-    <div className="border border-line-2 bg-surface p-6 font-mono text-[0.875rem] md:p-8">
+    <div className="card p-6 font-mono text-sm md:p-8">
       <label className="block">
-        <span className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Campo no formulário (edite)" en="Form field (edit it)" /></span>
-        <span className="mt-2 flex items-center border border-line-2 bg-bg px-4 text-ink focus-within:border-accent">
+        <span className="font-sans text-xs font-semibold text-text-2"><T pt="Campo no formulário (edite)" en="Form field (edit it)" /></span>
+        <span className="mt-2 flex items-center rounded-md border border-line-2 bg-surface px-4 text-ink focus-within:border-accent">
           cid10:&nbsp;
           <input
             value={code}
@@ -163,11 +163,11 @@ function Cipher() {
         AES-GCM · 256 bits
         <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
       </p>
-      <p className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Gravado no banco" en="Stored in the database" /></p>
-      <p className="mt-2 border border-line bg-bg px-4 py-3 break-all text-ink">
+      <p className="font-sans text-xs font-semibold text-text-2"><T pt="Gravado no banco" en="Stored in the database" /></p>
+      <p className="mt-2 rounded-sm bg-surface px-4 py-3 break-all text-ink">
         iv: "<Scramble text={out.iv} />"<br />ct: "<Scramble text={out.ct} />"
       </p>
-      <p className="mt-4 font-sans text-[0.8125rem] text-text-2">
+      <p className="mt-4 font-sans text-xs text-text-2">
         {out.live
           ? t('Cifrado agora, neste navegador, com uma chave descartável.', 'Encrypted just now, in this browser, with a throwaway key.')
           : t('Valores ilustrativos.', 'Illustrative values.')}

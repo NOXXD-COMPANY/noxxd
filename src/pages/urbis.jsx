@@ -13,13 +13,13 @@ const STATUS = {
   rejeitado: ['Rejeitado', 'Rejected', '#57534E', '#B8B2AC'],
 }
 
-function Badge({ status, step }) {
+function Badge({ status }) {
   const { t } = useLang()
   const [pt, en, light, dark] = STATUS[status]
   return (
     <span
-      className={`tone inline-flex items-center gap-2 rounded-sm px-3.5 py-2 text-sm font-bold whitespace-nowrap ${step !== undefined ? 'animate-step' : ''}`}
-      style={{ '--l': light, '--d': dark, animationDelay: `${(step || 0) * 2.5}s` }}
+      className="tone inline-flex items-center gap-2 rounded-sm px-3.5 py-2 text-sm font-semibold whitespace-nowrap"
+      style={{ '--l': light, '--d': dark }}
     >
       <i aria-hidden="true" className="size-2 rounded-xs bg-current" />
       {t(pt, en)}
@@ -78,17 +78,17 @@ function Report() {
 
   return (
     <div className="mt-14 grid items-start gap-8 lg:grid-cols-[minmax(300px,0.72fr)_1fr] lg:gap-12">
-      <section className="border border-line-2 bg-bg" aria-label={t('App do cidadão (demonstração)', 'Citizen app (demo)')}>
+      <section className="card overflow-hidden" aria-label={t('App do cidadão (demonstração)', 'Citizen app (demo)')}>
         <header className="flex items-baseline justify-between gap-4 border-b border-line bg-surface px-5 py-3">
           <strong className="font-product text-accent-ink"><T pt="App do cidadão" en="Citizen app" /></strong>
-          <span className="text-[0.8125rem] text-text-2"><T pt="Dados fictícios" en="Demo data" /></span>
+          <span className="text-xs text-text-2"><T pt="Dados fictícios" en="Demo data" /></span>
           <span className="sr-only" aria-live="polite">{status && `${t('Protocolo', 'Ticket')} 2026-0412: ${t(STATUS[status][0], STATUS[status][1])}`}</span>
         </header>
         {status ? (
           <div className="grid gap-4 p-5">
-            <p className="text-[0.875rem] text-text-2"><T pt="Relato enviado" en="Report sent" /></p>
-            <p className="font-product text-[1.5rem] leading-tight font-bold text-accent-ink tabular-nums"><T pt="Protocolo" en="Ticket" /> 2026-0412</p>
-            <p className="flex flex-wrap items-center gap-3 text-[0.9375rem] text-text-2">
+            <p className="text-sm text-text-2"><T pt="Relato enviado" en="Report sent" /></p>
+            <p className="font-product text-h3 leading-tight font-semibold text-accent-ink tabular-nums"><T pt="Protocolo" en="Ticket" /> 2026-0412</p>
+            <p className="flex flex-wrap items-center gap-3 text-md text-text-2">
               <T pt="Aba Monitorar:" en="Monitor tab:" /> <Badge status={status} />
             </p>
             <button type="button" className="btn btn-sm btn-outline justify-self-start" onClick={reset}><T pt="Novo relato" en="New report" /></button>
@@ -97,12 +97,12 @@ function Report() {
           <div className="p-5">
             <ol className="grid grid-cols-3 gap-2">
               {steps.map(([title], i) => (
-                <li key={i} aria-current={i === step ? 'step' : undefined} className={`border-t-2 pt-2 text-[0.8125rem] font-semibold transition-colors duration-300 ${i <= step ? 'border-accent text-accent-ink' : 'border-line text-text-2'}`}>
+                <li key={i} aria-current={i === step ? 'step' : undefined} className={`border-t-2 pt-2 text-xs font-semibold transition-colors duration-300 ${i <= step ? 'border-accent text-accent-ink' : 'border-line text-text-2'}`}>
                   <span className="mr-1.5 tabular-nums">{i + 1}</span>{title}
                 </li>
               ))}
             </ol>
-            <p className="mt-5 min-h-[3lh] text-[0.9375rem] leading-relaxed text-text-2">{steps[step][1]}</p>
+            <p className="mt-5 min-h-[3lh] text-md leading-relaxed text-text-2">{steps[step][1]}</p>
 
             {step === 0 && (
               <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={t('Categoria da ocorrência', 'Report category')}>
@@ -112,7 +112,7 @@ function Report() {
                     type="button"
                     aria-pressed={cat === i}
                     onClick={() => setCat(i)}
-                    className={`inline-flex min-h-11 cursor-pointer items-center gap-2.5 border px-3.5 text-[0.875rem] font-semibold transition-colors ${cat === i ? 'border-ink bg-ink text-bg' : 'border-line-2 text-text-2 hover:text-ink'}`}
+                    className={`inline-flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border px-3.5 text-sm font-semibold transition-colors ${cat === i ? 'border-ink bg-ink text-bg' : 'border-line-2 text-text-2 hover:text-ink'}`}
                   >
                     <i aria-hidden="true" className="size-2 flex-none" style={{ background: dot }} />
                     {t(pt, en)}
@@ -122,12 +122,12 @@ function Report() {
             )}
 
             {step === 1 && (
-              <dl className="mt-4 border-t border-line text-[0.9375rem]">
+              <dl className="mt-4 border-t border-line text-md">
                 <div className="flex items-center justify-between gap-4 border-b border-line py-3">
                   <dt className="text-text-2"><T pt="Fotos (até 3)" en="Photos (up to 3)" /></dt>
                   <dd className="flex items-center gap-2">
                     <span className="mr-2 flex gap-1" aria-hidden="true">
-                      {[0, 1, 2].map((i) => <i key={i} className={`size-3 border border-accent transition-colors ${i < photos ? 'bg-accent' : ''}`} />)}
+                      {[0, 1, 2].map((i) => <i key={i} className={`size-3 rounded-xs border border-accent transition-colors ${i < photos ? 'bg-accent' : ''}`} />)}
                     </span>
                     <button type="button" className="btn btn-sm btn-outline min-w-11 px-0!" disabled={photos === 0} onClick={() => setPhotos(photos - 1)} aria-label={t('Remover foto', 'Remove photo')}>−</button>
                     <output className="w-4 text-center font-semibold text-ink tabular-nums" aria-live="polite">{photos}</output>
@@ -150,7 +150,7 @@ function Report() {
             )}
 
             {step === 2 && (
-              <dl className="mt-4 border-t border-line text-[0.9375rem]">
+              <dl className="mt-4 border-t border-line text-md">
                 {[
                   [t('Categoria', 'Category'), <><i aria-hidden="true" className="mr-2 inline-block size-2" style={{ background: catDot }} />{t(catPt, catEn)}</>],
                   [t('Evidências', 'Evidence'), evidence],
@@ -174,10 +174,10 @@ function Report() {
         )}
       </section>
 
-      <section className="border border-line-2 bg-bg" aria-label={t('Painel da prefeitura (demonstração)', 'City hall dashboard (demo)')}>
+      <section className="card overflow-hidden" aria-label={t('Painel da prefeitura (demonstração)', 'City hall dashboard (demo)')}>
         <header className="flex items-baseline justify-between gap-4 border-b border-line bg-surface px-5 py-3">
           <strong className="font-product text-accent-ink"><T pt="Painel da prefeitura" en="City hall dashboard" /></strong>
-          <span className="font-mono text-[0.75rem] text-text-2">/relatos</span>
+          <span className="font-mono text-xs text-text-2">/relatos</span>
         </header>
         {status ? (
           <div className="p-5">
@@ -188,15 +188,15 @@ function Report() {
               </p>
               <Badge status={status} />
             </div>
-            <p className="mt-1 text-[0.875rem] text-text-2">{evidence} · <T pt="Rua das Acácias, 120" en="120 Acácias St" /></p>
+            <p className="mt-1 text-sm text-text-2">{evidence} · <T pt="Rua das Acácias, 120" en="120 Acácias St" /></p>
 
             <ol className="mt-5 border-t border-line" aria-label={t('Histórico auditável', 'Auditable history')}>
               {trail.toReversed().map((s, i) => (
                 <li key={s} className={`grid gap-x-5 gap-y-1 border-b border-line py-3.5 sm:grid-cols-[9.5rem_1fr] ${i === 0 ? 'animate-[feed-in_0.6s_var(--ease-out-expo)]' : ''}`}>
-                  <strong className="tone text-sm" style={{ '--l': STATUS[s][2], '--d': STATUS[s][3] }}>{t(STATUS[s][0], STATUS[s][1])}</strong>
-                  <span className="text-[0.9375rem] leading-relaxed text-ink">
+                  <strong className="text-sm" style={{ color: `light-dark(${STATUS[s][2]}, ${STATUS[s][3]})` }}>{t(STATUS[s][0], STATUS[s][1])}</strong>
+                  <span className="text-md leading-relaxed text-ink">
                     {t(LOG[s][0], LOG[s][1])}
-                    <small className="block text-[0.8125rem] text-text-2">{t(...LOG[s][2])}</small>
+                    <small className="block text-xs text-text-2">{t(...LOG[s][2])}</small>
                   </span>
                 </li>
               ))}
@@ -205,7 +205,7 @@ function Report() {
             <div className="mt-5 flex flex-wrap gap-3">
               {next && <button type="button" className="btn btn-sm" onClick={() => setTrail([...trail, next])}><T pt="Mover para" en="Move to" /> {t(STATUS[next][0], STATUS[next][1])}<Arrow /></button>}
               {(status === 'pendente' || status === 'analise') && <button type="button" className="btn btn-sm btn-outline" onClick={() => setTrail([...trail, 'rejeitado'])}><T pt="Rejeitar com justificativa" en="Reject with justification" /></button>}
-              {!next && <p className="text-[0.9375rem] text-text-2"><T pt="Ciclo encerrado. O histórico fica disponível para Tribunal de Contas e Ouvidoria." en="Lifecycle closed. The history stays available to audit courts and the ombudsman." /></p>}
+              {!next && <p className="text-md text-text-2"><T pt="Ciclo encerrado. O histórico fica disponível para Tribunal de Contas e Ouvidoria." en="Lifecycle closed. The history stays available to audit courts and the ombudsman." /></p>}
             </div>
           </div>
         ) : (
@@ -241,7 +241,7 @@ function Urbis() {
             {['pendente', 'analise', 'andamento', 'resolvido'].map((s, i) => (
               <li key={s} className="flex items-center gap-2.5">
                 {i > 0 && <span aria-hidden="true" className="hidden h-px w-6 bg-line-2 sm:block md:w-10" />}
-                <Badge status={s} step={i} />
+                <Badge status={s} />
               </li>
             ))}
             <li className="flex items-center gap-2.5 text-sm text-text-2 sm:ml-4 sm:border-l sm:border-line-2 sm:pl-5">

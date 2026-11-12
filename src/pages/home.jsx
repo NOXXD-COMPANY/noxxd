@@ -32,8 +32,8 @@ const SERVICES = [
   {
     title: ['Sistemas Web e SaaS', 'Web Systems & SaaS'],
     text: [
-      'Arquitetura e programação de plataformas multi-tenant (SaaS), aplicativos em nuvem e painéis de controle empresariais. Código escalável, controle de acesso seguro e integrações fluidas via APIs REST e GraphQL.',
-      'Architecture and development of multi-tenant SaaS platforms, cloud applications, and enterprise dashboards. Scalable code, secure access control, and seamless REST/GraphQL API integrations.',
+      'Arquitetura e programação de plataformas multi-tenant (SaaS), aplicativos em nuvem e painéis de controle empresariais. Código escalável, controle de acesso seguro e integrações via APIs REST e GraphQL.',
+      'Architecture and development of multi-tenant SaaS platforms, cloud applications, and enterprise dashboards. Scalable code, secure access control, and REST and GraphQL API integrations.',
     ],
     cta: ['Construir sistema', 'Build a system'],
   },

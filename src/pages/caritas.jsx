@@ -87,10 +87,10 @@ function Booking() {
   ]
   const action = [t('Pedir horário', 'Request slot'), t('Confirmar pelo WhatsApp', 'Confirm over WhatsApp'), t('Simular pagamento', 'Simulate payment'), t('Recomeçar', 'Start over')][stage]
   return (
-    <div className="border border-line-2 bg-bg">
+    <div className="card overflow-hidden">
       <p className="flex items-baseline justify-between gap-4 border-b border-line bg-surface px-5 py-3">
-        <code className="font-mono text-[0.8125rem] text-accent-ink">/agendar/seu-nome</code>
-        <span className="text-[0.8125rem] text-text-2"><T pt="Dados fictícios" en="Demo data" /></span>
+        <code className="font-mono text-xs text-accent-ink">/agendar/seu-nome</code>
+        <span className="text-xs text-text-2"><T pt="Dados fictícios" en="Demo data" /></span>
       </p>
       <div className="p-5">
         <div className="grid grid-cols-4 gap-2" role="group" aria-label={t('Horários livres', 'Open slots')}>
@@ -101,7 +101,7 @@ function Booking() {
               aria-pressed={slot === time}
               disabled={stage > 0}
               onClick={() => setSlot(time)}
-              className={`min-h-11 cursor-pointer border text-[0.9375rem] font-semibold tabular-nums transition-colors disabled:cursor-default ${
+              className={`min-h-11 cursor-pointer rounded-md border text-md font-semibold tabular-nums transition-colors disabled:cursor-default ${
                 slot === time ? 'border-accent bg-accent text-bg' : 'border-line-2 text-text-2 hover:text-ink disabled:opacity-40 disabled:hover:text-text-2'
               }`}
             >
@@ -112,10 +112,10 @@ function Booking() {
         <ol className="mt-5 border-t border-line" aria-live="polite">
           {rows.map(([title, detail], i) => (
             <li key={i} className="grid grid-cols-[12px_1fr] gap-4 border-b border-line py-3.5">
-              <i aria-hidden="true" className={`mt-2 size-3 border border-accent transition-colors duration-500 ${stage > i ? 'bg-accent' : ''}`} />
+              <i aria-hidden="true" className={`mt-2 size-3 rounded-xs border border-accent transition-colors duration-500 ${stage > i ? 'bg-accent' : ''}`} />
               <span>
                 <strong className="block font-product text-accent-ink">{title}</strong>
-                <span className="text-[0.9375rem] text-text-2">{detail}</span>
+                <span className="text-md text-text-2">{detail}</span>
               </span>
             </li>
           ))}
