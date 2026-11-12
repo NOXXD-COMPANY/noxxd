@@ -1,25 +1,24 @@
+import { useState } from 'react'
 import { mount } from '../mount.jsx'
 import { T, useLang } from '../lang.jsx'
-import { Faq, Loop, Shot } from '../ui.jsx'
+import { ld } from '../projects.js'
+import { Arrow, Faq, Shot } from '../ui.jsx'
 import { Close, Facts, H2, Hero, Points, ProjectPage } from '../project.jsx'
 
 // Report statuses from the product, muted: [pt, en, background, ink]
 const STATUS = {
-  pendente: ['Pendente', 'Pending', '#F6E3E0', '#8E3B32'],
-  analise: ['Em Análise', 'Under Review', '#F4ECD8', '#6E5114'],
-  andamento: ['Em Andamento', 'In Progress', '#E3EEF1', '#2F6B7C'],
-  resolvido: ['Resolvido', 'Resolved', '#E3EDE0', '#3F6B35'],
-  rejeitado: ['Rejeitado', 'Rejected', '#EDEBE9', '#57534E'],
+  pendente: ['Pendente', 'Pending', ld('#F6E3E0', '#3A1F1B'), ld('#8E3B32', '#F0A79D')],
+  analise: ['Em Análise', 'Under Review', ld('#F4ECD8', '#33290F'), ld('#6E5114', '#E3C377')],
+  andamento: ['Em Andamento', 'In Progress', ld('#E3EEF1', '#14252B'), ld('#2F6B7C', '#8CCBDC')],
+  resolvido: ['Resolvido', 'Resolved', ld('#E3EDE0', '#1A2A17'), ld('#3F6B35', '#A3D197')],
+  rejeitado: ['Rejeitado', 'Rejected', ld('#EDEBE9', '#2A2623'), ld('#57534E', '#C4BDB6')],
 }
 
-function Badge({ status, step }) {
+function Badge({ status }) {
   const { t } = useLang()
   const [pt, en, bg, fg] = STATUS[status]
   return (
-    <span
-      className={`inline-flex items-center gap-2 px-3.5 py-2 text-[0.875rem] font-bold whitespace-nowrap ${step !== undefined ? 'animate-[u-step_10s_var(--ease-out-expo)_infinite]' : ''}`}
-      style={{ background: bg, color: fg, animationDelay: `${(step || 0) * 2.5}s` }}
-    >
+    <span className="inline-flex items-center gap-2 px-3.5 py-2 text-[0.875rem] font-bold whitespace-nowrap" style={{ background: bg, color: fg }}>
       <i aria-hidden="true" className="size-2 bg-current" />
       {t(pt, en)}
     </span>
@@ -36,6 +35,186 @@ const CATEGORIES = [
   ['Iluminação pública', 'Street lighting', '#B07A3E'],
   ['Obras sem sinalização', 'Unsigned works', '#3F7A6E'],
 ]
+
+const FLOW = ['pendente', 'analise', 'andamento', 'resolvido']
+const DESK = ['M. Duarte · Secretaria de Obras', 'M. Duarte · Public Works']
+// Demo history: the mandatory justification and who signed it, per status
+const LOG = {
+  pendente: ['Relato recebido pelo app, com GPS e evidências.', 'Report received from the app, with GPS and evidence.', ['App do cidadão', 'Citizen app']],
+  analise: ['Triagem concluída: prioridade definida pela secretaria responsável.', 'Triage done: priority set by the responsible department.', DESK],
+  andamento: ['Equipe de campo despachada para o local.', 'Field crew dispatched to the site.', DESK],
+  resolvido: ['Serviço executado. Foto do serviço anexada.', 'Service completed. Photo of the work attached.', ['R. Lima · Equipe de campo', 'R. Lima · Field crew']],
+  rejeitado: ['Relato duplicado de um protocolo já em andamento.', 'Duplicate of a report already in progress.', DESK],
+}
+
+// React Bits "Stepper" pattern, wired to the product's own flow: the citizen files a report in three steps
+// on the left, city hall moves it through the audited lifecycle on the right. All demo data.
+function Report() {
+  const { t } = useLang()
+  const [step, setStep] = useState(0)
+  const [cat, setCat] = useState(0)
+  const [photos, setPhotos] = useState(1)
+  const [voice, setVoice] = useState(false)
+  const [trail, setTrail] = useState([]) // statuses the report has been through; empty until it is sent
+  const status = trail.at(-1)
+  const next = FLOW.includes(status) ? FLOW[FLOW.indexOf(status) + 1] : undefined // rejected reports are closed
+  const [catPt, catEn, catDot] = CATEGORIES[cat]
+  const reset = () => {
+    setStep(0)
+    setTrail([])
+  }
+  const steps = [
+    [t('Categoria', 'Category'), t('As categorias vêm do banco de cada município, sem reescrever código.', "Categories load from each city's database, with no code changes.")],
+    [t('Evidências', 'Evidence'), t('Fotos redimensionadas antes do upload, nota de voz e coordenadas convertidas em rua e bairro.', 'Photos resized before upload, a voice note, and coordinates converted to street and district.')],
+    [t('Confirmação', 'Confirmation'), t('Revise e envie. Depois, cada mudança de status aparece na aba Monitorar.', 'Review and submit. After that, every status change shows up in the Monitor tab.')],
+  ]
+  const evidence = [
+    t(`${photos} foto${photos === 1 ? '' : 's'}`, `${photos} photo${photos === 1 ? '' : 's'}`),
+    voice && t('nota de voz', 'voice note'),
+    'GPS ±4 m',
+  ].filter(Boolean).join(' · ')
+
+  return (
+    <div className="mt-14 grid items-start gap-8 lg:grid-cols-[minmax(300px,0.72fr)_1fr] lg:gap-12">
+      <section className="border border-line-2 bg-bg" aria-label={t('App do cidadão (demonstração)', 'Citizen app (demo)')}>
+        <header className="flex items-baseline justify-between gap-4 border-b border-line bg-surface px-5 py-3">
+          <strong className="font-product text-accent-ink"><T pt="App do cidadão" en="Citizen app" /></strong>
+          <span className="text-[0.8125rem] text-text-2"><T pt="Dados fictícios" en="Demo data" /></span>
+          <span className="sr-only" aria-live="polite">{status && `${t('Protocolo', 'Ticket')} 2026-0412: ${t(STATUS[status][0], STATUS[status][1])}`}</span>
+        </header>
+        {status ? (
+          <div className="grid gap-4 p-5">
+            <p className="text-[0.875rem] text-text-2"><T pt="Relato enviado" en="Report sent" /></p>
+            <p className="font-product text-[1.5rem] leading-tight font-bold text-accent-ink tabular-nums"><T pt="Protocolo" en="Ticket" /> 2026-0412</p>
+            <p className="flex flex-wrap items-center gap-3 text-[0.9375rem] text-text-2">
+              <T pt="Aba Monitorar:" en="Monitor tab:" /> <Badge status={status} />
+            </p>
+            <button type="button" className="btn btn-sm btn-outline justify-self-start" onClick={reset}><T pt="Novo relato" en="New report" /></button>
+          </div>
+        ) : (
+          <div className="p-5">
+            <ol className="grid grid-cols-3 gap-2">
+              {steps.map(([title], i) => (
+                <li key={i} aria-current={i === step ? 'step' : undefined} className={`border-t-2 pt-2 text-[0.8125rem] font-semibold transition-colors duration-300 ${i <= step ? 'border-accent text-accent-ink' : 'border-line text-text-2'}`}>
+                  <span className="mr-1.5 tabular-nums">{i + 1}</span>{title}
+                </li>
+              ))}
+            </ol>
+            <p className="mt-5 min-h-[3lh] text-[0.9375rem] leading-relaxed text-text-2">{steps[step][1]}</p>
+
+            {step === 0 && (
+              <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={t('Categoria da ocorrência', 'Report category')}>
+                {CATEGORIES.map(([pt, en, dot], i) => (
+                  <button
+                    key={pt}
+                    type="button"
+                    aria-pressed={cat === i}
+                    onClick={() => setCat(i)}
+                    className={`inline-flex min-h-11 cursor-pointer items-center gap-2.5 border px-3.5 text-[0.875rem] font-semibold transition-colors ${cat === i ? 'border-ink bg-ink text-bg' : 'border-line-2 text-text-2 hover:text-ink'}`}
+                  >
+                    <i aria-hidden="true" className="size-2 flex-none" style={{ background: dot }} />
+                    {t(pt, en)}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {step === 1 && (
+              <dl className="mt-4 border-t border-line text-[0.9375rem]">
+                <div className="flex items-center justify-between gap-4 border-b border-line py-3">
+                  <dt className="text-text-2"><T pt="Fotos (até 3)" en="Photos (up to 3)" /></dt>
+                  <dd className="flex items-center gap-2">
+                    <span className="mr-2 flex gap-1" aria-hidden="true">
+                      {[0, 1, 2].map((i) => <i key={i} className={`size-3 border border-accent transition-colors ${i < photos ? 'bg-accent' : ''}`} />)}
+                    </span>
+                    <button type="button" className="btn btn-sm btn-outline min-w-11 px-0!" disabled={photos === 0} onClick={() => setPhotos(photos - 1)} aria-label={t('Remover foto', 'Remove photo')}>−</button>
+                    <output className="w-4 text-center font-semibold text-ink tabular-nums" aria-live="polite">{photos}</output>
+                    <button type="button" className="btn btn-sm btn-outline min-w-11 px-0!" disabled={photos === 3} onClick={() => setPhotos(photos + 1)} aria-label={t('Adicionar foto', 'Add photo')}>+</button>
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-4 border-b border-line py-3">
+                  <dt className="text-text-2"><T pt="Nota de voz" en="Voice note" /></dt>
+                  <dd>
+                    <button type="button" className={`btn btn-sm ${voice ? '' : 'btn-outline'}`} aria-pressed={voice} onClick={() => setVoice(!voice)}>
+                      {voice ? t('Gravada · 0:12', 'Recorded · 0:12') : t('Gravar', 'Record')}
+                    </button>
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-4 border-b border-line py-3">
+                  <dt className="whitespace-nowrap text-text-2">GPS ±4 m</dt>
+                  <dd className="text-right font-semibold text-ink"><T pt="Rua das Acácias, 120 · Centro" en="120 Acácias St · Downtown" /></dd>
+                </div>
+              </dl>
+            )}
+
+            {step === 2 && (
+              <dl className="mt-4 border-t border-line text-[0.9375rem]">
+                {[
+                  [t('Categoria', 'Category'), <><i aria-hidden="true" className="mr-2 inline-block size-2" style={{ background: catDot }} />{t(catPt, catEn)}</>],
+                  [t('Evidências', 'Evidence'), evidence],
+                  [t('Local', 'Location'), t('Rua das Acácias, 120 · Centro', '120 Acácias St · Downtown')],
+                ].map(([dt, dd]) => (
+                  <div key={dt} className="flex items-baseline justify-between gap-4 border-b border-line py-3">
+                    <dt className="text-text-2">{dt}</dt>
+                    <dd className="text-right font-semibold text-ink">{dd}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            <div className="mt-6 flex justify-between gap-3">
+              <button type="button" className="btn btn-sm btn-outline" disabled={step === 0} onClick={() => setStep(step - 1)}><T pt="Voltar" en="Back" /></button>
+              {step < 2
+                ? <button type="button" className="btn btn-sm" onClick={() => setStep(step + 1)}><T pt="Continuar" en="Continue" /><Arrow /></button>
+                : <button type="button" className="btn btn-sm" onClick={() => setTrail(['pendente'])}><T pt="Enviar relato" en="Send report" /><Arrow /></button>}
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="border border-line-2 bg-bg" aria-label={t('Painel da prefeitura (demonstração)', 'City hall dashboard (demo)')}>
+        <header className="flex items-baseline justify-between gap-4 border-b border-line bg-surface px-5 py-3">
+          <strong className="font-product text-accent-ink"><T pt="Painel da prefeitura" en="City hall dashboard" /></strong>
+          <span className="font-mono text-[0.75rem] text-text-2">/relatos</span>
+        </header>
+        {status ? (
+          <div className="p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="font-semibold text-ink">
+                <i aria-hidden="true" className="mr-2.5 inline-block size-2" style={{ background: catDot }} />
+                {t(catPt, catEn)} <span className="ml-2 font-normal text-text-2 tabular-nums">2026-0412</span>
+              </p>
+              <Badge status={status} />
+            </div>
+            <p className="mt-1 text-[0.875rem] text-text-2">{evidence} · <T pt="Rua das Acácias, 120" en="120 Acácias St" /></p>
+
+            <ol className="mt-5 border-t border-line" aria-label={t('Histórico auditável', 'Auditable history')}>
+              {trail.toReversed().map((s, i) => (
+                <li key={s} className={`grid gap-x-5 gap-y-1 border-b border-line py-3.5 sm:grid-cols-[9.5rem_1fr] ${i === 0 ? 'animate-[feed-in_0.6s_var(--ease-out-expo)]' : ''}`}>
+                  <strong className="text-[0.875rem]" style={{ color: STATUS[s][3] }}>{t(STATUS[s][0], STATUS[s][1])}</strong>
+                  <span className="text-[0.9375rem] leading-relaxed text-ink">
+                    {t(LOG[s][0], LOG[s][1])}
+                    <small className="block text-[0.8125rem] text-text-2">{t(...LOG[s][2])}</small>
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              {next && <button type="button" className="btn btn-sm" onClick={() => setTrail([...trail, next])}><T pt="Mover para" en="Move to" /> {t(STATUS[next][0], STATUS[next][1])}<Arrow /></button>}
+              {(status === 'pendente' || status === 'analise') && <button type="button" className="btn btn-sm btn-outline" onClick={() => setTrail([...trail, 'rejeitado'])}><T pt="Rejeitar com justificativa" en="Reject with justification" /></button>}
+              {!next && <p className="text-[0.9375rem] text-text-2"><T pt="Ciclo encerrado. O histórico fica disponível para Tribunal de Contas e Ouvidoria." en="Lifecycle closed. The history stays available to audit courts and the ombudsman." /></p>}
+            </div>
+          </div>
+        ) : (
+          <p className="max-w-[44ch] p-5 text-text-2">
+            <T pt="Nenhum relato na fila. Envie um pelo app ao lado e conduza o ciclo de vida daqui." en="No reports in the queue. Send one from the app and drive its lifecycle from here." />
+          </p>
+        )}
+      </section>
+    </div>
+  )
+}
 
 function Urbis() {
   const { t } = useLang()
@@ -60,7 +239,7 @@ function Urbis() {
             {['pendente', 'analise', 'andamento', 'resolvido'].map((s, i) => (
               <li key={s} className="flex items-center gap-2.5">
                 {i > 0 && <span aria-hidden="true" className="hidden h-px w-6 bg-line-2 sm:block md:w-10" />}
-                <Badge status={s} step={i} />
+                <Badge status={s} />
               </li>
             ))}
             <li className="flex items-center gap-2.5 text-[0.875rem] text-text-2 sm:ml-4 sm:border-l sm:border-line-2 sm:pl-5">
@@ -137,53 +316,43 @@ function Urbis() {
         ]}
       />
 
-      <div className="border-b border-line py-5">
-        <Loop
-          label={t('Categorias de ocorrência', 'Report categories')}
-          speed="40s"
-          itemClass="mr-3 inline-flex items-center gap-2.5 border border-line-2 bg-bg px-4 py-2 text-[0.9375rem] font-semibold whitespace-nowrap"
-          items={CATEGORIES.map(([pt, en, dot]) => (
-            <>
-              <i aria-hidden="true" className="size-2" style={{ background: dot }} />
-              {t(pt, en)}
-            </>
-          ))}
-        />
-      </div>
-
       <section className="section" aria-labelledby="flow-title">
         <div className="wrap">
           <H2 id="flow-title">{t('Do buraco na rua ao serviço executado', 'From pothole to completed service')}</H2>
           <p className="lead mt-6">
             <T
-              pt="O relato foi desenhado em três etapas curtas, com transições a 60 fps e validação assistida, para funcionar até com sinal fraco."
-              en="Reporting takes three short steps, with 60 fps transitions and assisted validation, designed to work even on a weak signal."
+              pt="O relato foi desenhado em três etapas curtas, com transições a 60 fps e validação assistida, para funcionar até com sinal fraco. Experimente: envie um relato e conduza o ciclo de vida no painel."
+              en="Reporting takes three short steps, with 60 fps transitions and assisted validation, designed to work even on a weak signal. Try it: send a report and drive its lifecycle on the dashboard."
             />
           </p>
-          <ol className="mt-14 grid gap-10 md:grid-cols-[1fr_1.35fr_1fr_auto] md:gap-10">
+          <Report />
+        </div>
+      </section>
+
+      <section className="section border-t border-line" aria-labelledby="who-title">
+        <div className="wrap grid gap-10 md:grid-cols-[5fr_7fr] md:gap-12">
+          <div>
+            <H2 id="who-title">{t('Quatro papéis, um mesmo relato', 'Four roles, one report')}</H2>
+            <p className="lead mt-6">
+              <T pt="Cada pessoa vê a mesma ocorrência pelo ângulo do seu trabalho." en="Each person sees the same report from the angle of their job." />
+            </p>
+          </div>
+          <dl className="border-t border-line">
             {[
-              [t('Categoria', 'Category'), t('Iluminação, buraco, lixo, vazamento: as categorias vêm do banco de cada município, sem reescrever código.', "Lighting, potholes, waste, leaks: categories load from each city's database, with no code changes.")],
-              [t('Evidências', 'Evidence'), t('Câmera nativa com redimensionamento antes do upload, nota de voz com pulso visual e coordenadas convertidas em rua e bairro.', 'Native camera with pre-upload resizing, a voice note with a visual pulse, and coordinates converted to street and district.')],
-              [t('Confirmação', 'Confirmation'), t('Revisão, descrição complementar e envio. O cidadão acompanha cada mudança de status na aba Monitorar.', 'Review, extra description and submit. Citizens follow every status change in the Monitor tab.')],
-            ].map(([title, text], i) => (
-              <li key={i} className="border-t border-accent pt-5">
-                <span className="font-mono text-[0.875rem] text-accent">0{i + 1}</span>
-                <h3 className="mt-2 font-product text-[1.3rem] font-bold text-accent-ink">{title}</h3>
-                <p className="mt-2 text-text-2">{text}</p>
-                {i === 1 && (
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {[t('Até 3 fotos', 'Up to 3 photos'), t('Nota de voz', 'Voice note'), t('GPS exato', 'Exact GPS')].map((e) => (
-                      <li key={e} className="bg-tint px-3 py-1.5 text-[0.875rem] font-semibold text-accent-ink">{e}</li>
-                    ))}
-                  </ul>
-                )}
-              </li>
+              [t('Cidadão', 'Citizen'), t('App', 'App'), t('Relata em três etapas e acompanha cada mudança de status na aba Monitorar.', 'Files a report in three steps and follows every status change in the Monitor tab.')],
+              [t('Operador', 'Operator'), t('Painel', 'Dashboard'), t('Faz a triagem e a moderação; toda mudança de status leva justificativa técnica.', 'Handles triage and moderation; every status change carries a technical justification.')],
+              [t('Gestor municipal', 'City manager'), t('Painel', 'Dashboard'), t('Lê o mapa de calor e os KPIs para priorizar investimento por bairro.', 'Reads the heatmap and KPIs to prioritize investment by district.')],
+              [t('Tribunal de Contas e Ouvidoria', 'Audit court and ombudsman'), t('Histórico', 'History'), t('Consultam o histórico auditável de status e justificativas.', 'Review the auditable history of statuses and justifications.')],
+            ].map(([role, where, what]) => (
+              <div key={role} className="grid gap-x-6 gap-y-1 border-b border-line py-5 sm:grid-cols-[minmax(0,13rem)_1fr]">
+                <dt className="font-product font-bold text-accent-ink">
+                  {role}
+                  <small className="block font-sans text-[0.8125rem] font-medium text-accent">{where}</small>
+                </dt>
+                <dd className="text-text-2">{what}</dd>
+              </div>
             ))}
-            <li className="border-t border-line-2 pt-5">
-              <p className="mb-3 text-[0.9375rem] text-text-2"><T pt="Chega ao painel como" en="Lands on the dashboard as" /></p>
-              <Badge status="pendente" />
-            </li>
-          </ol>
+          </dl>
         </div>
       </section>
 

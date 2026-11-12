@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { mount } from '../mount.jsx'
 import { T, useLang } from '../lang.jsx'
-import { Faq, Shot, useReducedMotion } from '../ui.jsx'
+import { ld } from '../projects.js'
+import { Faq, Scramble, Shot } from '../ui.jsx'
 import { Close, Facts, H2, Hero, Points, ProjectPage } from '../project.jsx'
 
-// HealthSearch traffic light and ASO states, muted
+// SIGAC traffic light and ASO states, muted
 const C = { ok: '#4F7A4A', due: '#9A6E1F', late: '#A2483E', requested: '#5B5F97', booked: '#3F6E8C', pending: '#78716C' }
 
 const DUE = [6, 12, 33]
@@ -38,7 +39,7 @@ function Matrix() {
             key={n}
             className="grid aspect-square place-items-center font-mono text-[0.8125rem] transition-opacity duration-300"
             // only exceptions are solid; compliant standards stay a quiet tint
-            style={{ background: status === 'ok' ? '#E6EDE4' : C[status], color: status === 'ok' ? '#3D5F39' : '#FFFFFF', opacity: show === 'all' || show === status ? 1 : 0.15 }}
+            style={{ background: status === 'ok' ? ld('#E6EDE4', '#1F2B1D') : C[status], color: status === 'ok' ? ld('#3D5F39', '#A6CC9F') : '#FFFFFF', opacity: show === 'all' || show === status ? 1 : 0.15 }}
           >
             {n}
           </li>
@@ -65,33 +66,114 @@ function Matrix() {
   )
 }
 
-// Animated alert feed: the oldest alert moves to the top every 2.4 s
+// The preventive window, hands-on: drag the days left on one exam and its state follows the NR-07 traffic light.
 function Feed({ items }) {
-  const reduced = useReducedMotion()
-  const [order, setOrder] = useState(() => items.map((_, i) => i))
-  useEffect(() => {
-    if (reduced) return
-    const id = setInterval(() => setOrder((o) => [o[o.length - 1], ...o.slice(0, -1)]), 2400)
-    return () => clearInterval(id)
-  }, [reduced])
+  const { t } = useLang()
+  const [days, setDays] = useState(45)
+  const state = days < 0 ? 'late' : days <= 30 ? 'due' : 'ok'
+  const label = { ok: t('Em Dia', 'Up to Date'), due: t('A Vencer', 'Due Soon'), late: t('Vencido', 'Expired') }[state]
+  const detail = days < 0
+    ? t(`Venceu há ${-days} dia${days === -1 ? '' : 's'} · inconformidade com a NR-07`, `Expired ${-days} day${days === -1 ? '' : 's'} ago · NR-07 non-compliance`)
+    : t(`Vence em ${days} dia${days === 1 ? '' : 's'} · Metalúrgica Vale Azul`, `Due in ${days} day${days === 1 ? '' : 's'} · Metalúrgica Vale Azul`)
   return (
-    <ul className="border-t border-line" aria-label="Alertas / Alerts">
-      {order.map((i, pos) => {
-        const [title, detail, color] = items[i]
-        return (
-          <li
-            key={i}
-            className={`grid grid-cols-[10px_1fr] gap-4 border-b border-line bg-bg py-4 ${pos === 0 && !reduced ? 'animate-[feed-in_0.6s_var(--ease-out-expo)]' : ''}`}
-          >
+    <div>
+      <label className="block border border-line-2 bg-bg p-5">
+        <span className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <span className="font-semibold text-ink"><T pt="Dias até o vencimento do ASO" en="Days until the exam expires" /></span>
+          <output className="font-product text-[1.75rem] leading-none font-bold text-accent-ink tabular-nums">{days}</output>
+        </span>
+        <input
+          type="range"
+          min="-15"
+          max="60"
+          value={days}
+          onChange={(event) => setDays(Number(event.target.value))}
+          aria-valuetext={`${days} · ${label}`}
+          className="range mt-4 w-full"
+          style={{ '--range': C[state] }}
+        />
+        <span className="mt-2 flex justify-between text-[0.8125rem] text-text-2" aria-hidden="true">
+          <span><T pt="Vencido" en="Expired" /></span>
+          <span><T pt="janela de 30 dias" en="30-day window" /></span>
+          <span><T pt="Em dia" en="Up to date" /></span>
+        </span>
+      </label>
+      <ul className="mt-5 border-t border-line" aria-label={t('Alertas', 'Alerts')}>
+        <li key={state} className="grid animate-[feed-in_0.6s_var(--ease-out-expo)] grid-cols-[10px_1fr_auto] items-start gap-4 border-b border-line py-4">
+          <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: C[state] }} />
+          <span>
+            <strong className="block font-semibold text-ink"><T pt="ASO periódico" en="Periodic exam" /> · Igor Batista</strong>
+            <small className="text-[0.875rem] text-text-2">{detail}</small>
+          </span>
+          <b className="px-2.5 py-1 text-[0.8125rem] whitespace-nowrap text-white" style={{ background: C[state] }}>{label}</b>
+        </li>
+        {items.map(([title, detail, color]) => (
+          <li key={title} className="grid grid-cols-[10px_1fr] gap-4 border-b border-line py-4">
             <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: color }} />
             <span>
               <strong className="block font-semibold text-ink">{title}</strong>
               <small className="text-[0.875rem] text-text-2">{detail}</small>
             </span>
           </li>
-        )
-      })}
-    </ul>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+const b64 = (bytes) => btoa(String.fromCharCode(...bytes))
+
+// The claim, run for real: this field is encrypted with AES-GCM 256 by the Web Crypto API in this very browser.
+// The key is generated here, never leaves the tab and is thrown away with it.
+function Cipher() {
+  const { t } = useLang()
+  const [code, setCode] = useState('M54.5')
+  const [out, setOut] = useState({ iv: 'q3Z9rT0bWm1xYc2K', ct: '8fJ2pL0vQe7nR4sT1wXk9uZb6yHc3mAd', live: false }) // prerendered placeholder
+  const key = useRef(null)
+  useEffect(() => {
+    let current = true
+    const run = async () => {
+      key.current ||= await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt'])
+      const iv = crypto.getRandomValues(new Uint8Array(12))
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key.current, new TextEncoder().encode(code))
+      if (current) setOut({ iv: b64(iv), ct: b64(new Uint8Array(ct)), live: true })
+    }
+    run().catch(() => {}) // no Web Crypto (insecure origin, old browser): the illustrative values stay
+    return () => {
+      current = false
+    }
+  }, [code])
+  return (
+    <div className="border border-line-2 bg-surface p-6 font-mono text-[0.875rem] md:p-8">
+      <label className="block">
+        <span className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Campo no formulário (edite)" en="Form field (edit it)" /></span>
+        <span className="mt-2 flex items-center border border-line-2 bg-bg px-4 text-ink focus-within:border-accent">
+          cid10:&nbsp;
+          <input
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+            maxLength={8}
+            spellCheck={false}
+            autoComplete="off"
+            className="min-h-12 w-full bg-transparent outline-none"
+          />
+        </span>
+      </label>
+      <p className="my-5 flex items-center gap-3 text-accent">
+        <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
+        AES-GCM · 256 bits
+        <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
+      </p>
+      <p className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Gravado no banco" en="Stored in the database" /></p>
+      <p className="mt-2 border border-line bg-bg px-4 py-3 break-all text-ink">
+        iv: "<Scramble text={out.iv} />"<br />ct: "<Scramble text={out.ct} />"
+      </p>
+      <p className="mt-4 font-sans text-[0.8125rem] text-text-2">
+        {out.live
+          ? t('Cifrado agora, neste navegador, com uma chave descartável.', 'Encrypted just now, in this browser, with a throwaway key.')
+          : t('Valores ilustrativos.', 'Illustrative values.')}
+      </p>
+    </div>
   )
 }
 
@@ -152,7 +234,7 @@ function Palette({ items }) {
   )
 }
 
-function HealthSearch() {
+function Sigac() {
   const { t } = useLang()
   const kbd = (
     <>
@@ -160,17 +242,17 @@ function HealthSearch() {
     </>
   )
   return (
-    <ProjectPage slug="healthsearch">
+    <ProjectPage slug="sigac">
       <Hero
-        logo="/assets/projetos/healthsearch/logo.svg"
+        logo="/assets/projetos/sigac/logo.svg"
         logoSize={[120, 120]}
-        name="HealthSearch"
-        byline={t('Central de SST que sustenta o SIGAC · desenvolvida pela NOXXD', 'The OHS hub behind SIGAC · built by NOXXD')}
+        name="SIGAC"
+        byline={t('Sistema Integrado de Gestão Administrativa de Contratos · desenvolvido pela NOXXD', 'Integrated Administrative Contract Management System · built by NOXXD')}
         title={t('Nenhum ASO vence', 'No medical exam expires')}
         em={t('sem aviso.', 'unnoticed.')}
         lead={t(
-          'Saúde e Segurança do Trabalho em uma única central: ciclo completo do ASO, matriz de treinamentos das NRs, fechamento mensal de folha e absenteísmo, com dados clínicos criptografados no próprio navegador.',
-          'Occupational health and safety in a single hub: the full medical-exam (ASO) cycle, the regulatory training matrix, monthly payroll closing and absenteeism, with clinical data encrypted right in the browser.',
+          'A central de Saúde e Segurança do Trabalho do SIGAC: ciclo completo do ASO, matriz de treinamentos das NRs, fechamento mensal de folha e absenteísmo, com dados clínicos criptografados no próprio navegador.',
+          'The occupational health and safety hub of SIGAC: the full medical-exam (ASO) cycle, the regulatory training matrix, monthly payroll closing and absenteeism, with clinical data encrypted right in the browser.',
         )}
         secondary={['#modulos', t('Ver os módulos', 'See the modules')]}
       >
@@ -220,8 +302,8 @@ function HealthSearch() {
           </ol>
           <Shot
             className="mt-14"
-            src="/assets/projetos/healthsearch/screens/ficha-colaborador.webp"
-            alt={t('HealthSearch: ficha do funcionário com dados, NRs aplicáveis e histórico de ASOs', 'HealthSearch: employee profile with details, applicable NRs and exam history')}
+            src="/assets/projetos/sigac/screens/ficha-colaborador.webp"
+            alt={t('SIGAC: ficha do funcionário com dados, NRs aplicáveis e histórico de ASOs', 'SIGAC: employee profile with details, applicable NRs and exam history')}
             width={1440}
             height={900}
             url="/funcionarios/func_003"
@@ -245,15 +327,14 @@ function HealthSearch() {
             <H2 id="feed-title">{t('O alerta chega antes do vencimento', 'The alert arrives before the deadline')}</H2>
             <p className="lead mt-6">
               <T
-                pt="Exames, treinamentos e guias mudam de estado e aparecem para a equipe de SST na hora, com a cor do semáforo."
-                en="Exams, training and referrals change state and reach the OHS team right away, in traffic-light colour."
+                pt="Exames, treinamentos e guias mudam de estado e aparecem para a equipe de SST na hora, com a cor do semáforo. Arraste os dias de um ASO e veja o estado virar aos 30."
+                en="Exams, training and referrals change state and reach the OHS team right away, in traffic-light colour. Drag the days left on an exam and watch the state flip at 30."
               />
             </p>
             <p className="mt-4 text-[0.875rem] text-text-2"><T pt="Dados fictícios" en="Demo data" /></p>
           </div>
           <Feed
             items={[
-              ['ASO periódico · Igor Batista', t('Vence em 12 dias · Metalúrgica Vale Azul', 'Due in 12 days · Metalúrgica Vale Azul'), C.due],
               ['NR-35 · Helena Campos', t('Treinamento vencido · Agro Sertão Verde', 'Training expired · Agro Sertão Verde'), C.late],
               ['ASO admissional · Kléber Ramos', t('Agendado na Clínica Ocupacional Vida', 'Booked at Clínica Ocupacional Vida'), C.booked],
               ['ASO periódico · Beatriz Pinto', t('Laudo anexado, aptidão em dia', 'Report attached, fitness confirmed'), C.ok],
@@ -268,8 +349,8 @@ function HealthSearch() {
           <H2 id="mod-title">{t('Uma central para toda a operação de SST', 'One hub for the whole OHS operation')}</H2>
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
             <Shot
-              src="/assets/projetos/healthsearch/screens/dashboard.webp"
-              alt={t('HealthSearch: painel de conformidade com ASOs vencidos, a vencer e gráfico de vencimentos', 'HealthSearch: compliance dashboard with expired and due exams and an expiry chart')}
+              src="/assets/projetos/sigac/screens/dashboard.webp"
+              alt={t('SIGAC: painel de conformidade com ASOs vencidos, a vencer e gráfico de vencimentos', 'SIGAC: compliance dashboard with expired and due exams and an expiry chart')}
               width={1440}
               height={900}
               url="/dashboard"
@@ -280,7 +361,7 @@ function HealthSearch() {
                 [t('Gestão do ASO', 'Medical exam management'), t('Ciclo de vida completo do ASO, exames complementares e ficha do colaborador, com folhas A4 normativas geradas no cliente via jsPDF.', 'The full exam lifecycle, complementary exams and employee profile, with regulatory A4 sheets rendered client-side with jsPDF.')],
                 [t('Matriz de treinamentos', 'Training matrix'), t('Treinamentos da NR-01 à NR-35 organizados em uma matriz por colaborador.', 'Training from NR-01 to NR-35 organized in a per-employee matrix.')],
                 [t('Folha e absenteísmo', 'Payroll and absenteeism'), t('Fechamento mensal de folha e acompanhamento de absenteísmo, com indicadores visuais em Recharts.', 'Monthly payroll closing and absenteeism tracking, with visual indicators in Recharts.')],
-                [t('Busca global HealthSearch', 'HealthSearch global search'), <>{t('Colaboradores, exames e clínicas em uma janela acionada por', 'Employees, exams and clinics in one window opened with')} {kbd}{t(', de qualquer tela.', ', from any screen.')}</>],
+                [t('Busca global', 'Global search'), <>{t('Colaboradores, exames e clínicas em uma janela acionada por', 'Employees, exams and clinics in one window opened with')} {kbd}{t(', de qualquer tela.', ', from any screen.')}</>],
               ].map(([dt, dd]) => (
                 <div key={dt} className="border-b border-line py-5">
                   <dt className="font-product text-[1.125rem] font-bold text-accent-ink">{dt}</dt>
@@ -332,20 +413,7 @@ function HealthSearch() {
               ]}
             />
           </div>
-          <div className="border border-line-2 bg-surface p-6 font-mono text-[0.875rem] md:p-8">
-            <p className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Campo no formulário" en="Form field" /></p>
-            <p className="mt-2 border border-line bg-bg px-4 py-3 text-ink">cid10: "M54.5"</p>
-            <p className="my-5 flex items-center gap-3 text-accent">
-              <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
-              AES-GCM · 256 bits
-              <span aria-hidden="true" className="h-px flex-1 bg-accent/40" />
-            </p>
-            <p className="font-sans text-[0.8125rem] font-semibold text-text-2"><T pt="Gravado no banco" en="Stored in the database" /></p>
-            <p className="mt-2 border border-line bg-bg px-4 py-3 break-all text-ink">
-              iv: "q3Z9rT0bWm1xYc2K"<br />ct: "8fJ2pL0vQe7nR4sT1wXk9uZb6yHc3mAd"
-            </p>
-            <p className="mt-4 font-sans text-[0.8125rem] text-text-2"><T pt="Valores ilustrativos." en="Illustrative values." /></p>
-          </div>
+          <Cipher />
         </div>
       </section>
 
@@ -396,13 +464,13 @@ function HealthSearch() {
       <Close
         title={t('Sua SST em dia, todos os dias', 'Your OHS up to date, every day')}
         lead={t(
-          'Converse com a NOXXD sobre implantar o HealthSearch ou construir uma central sob medida para a sua empresa.',
-          'Talk to NOXXD about deploying HealthSearch or building a custom hub for your company.',
+          'Converse com a NOXXD sobre implantar o SIGAC ou construir uma central sob medida para a sua empresa.',
+          'Talk to NOXXD about deploying SIGAC or building a custom hub for your company.',
         )}
       />
     </ProjectPage>
   )
 }
 
-export default HealthSearch
-mount(HealthSearch)
+export default Sigac
+mount(Sigac)

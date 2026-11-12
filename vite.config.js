@@ -10,7 +10,7 @@ export default defineConfig({
       input: {
         home: 'index.html',
         urbis: 'projetos/urbis/index.html',
-        healthsearch: 'projetos/healthsearch/index.html',
+        sigac: 'projetos/sigac/index.html',
         caritas: 'projetos/caritas/index.html',
       },
     },

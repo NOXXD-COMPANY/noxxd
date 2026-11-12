@@ -1,7 +1,7 @@
 import { mount } from '../mount.jsx'
 import { T, useLang } from '../lang.jsx'
-import { Arrow, BlurText, Footer, Header, Loop } from '../ui.jsx'
-import { themeOf } from '../projects.js'
+import { Arrow, BlurText, Footer, Header, Spotlight } from '../ui.jsx'
+import { PROJECTS, themeOf } from '../projects.js'
 
 const STACK = ['React 19', 'React Native', 'Expo', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Vite', 'Firebase', 'Supabase', 'Leaflet', 'Recharts', 'Cloudflare R2', 'jsPDF', 'GPT-4o-mini']
 
@@ -35,9 +35,6 @@ const SERVICES = [
 const PROJECT_ROWS = [
   {
     slug: 'urbis',
-    name: 'Urbis',
-    logo: '/assets/projetos/urbis/logo.svg',
-    size: [120, 120],
     tags: [['GovTech', 'GovTech'], ['App + Painel Web', 'App + Web Dashboard']],
     summary: [
       'Zeladoria urbana para prefeituras: o cidadão relata com foto, áudio e geolocalização exata, e a gestão municipal decide pelo mapa de calor.',
@@ -47,23 +44,17 @@ const PROJECT_ROWS = [
     metric: [['Lei 14.129/2021', 'Law 14.129/2021'], ['Governo Digital + LGPD', 'Digital Government + LGPD']],
   },
   {
-    slug: 'healthsearch',
-    name: 'HealthSearch',
-    logo: '/assets/projetos/healthsearch/logo.svg',
-    size: [120, 120],
+    slug: 'sigac',
     tags: [['SST / RH', 'OHS / HR'], ['SaaS', 'SaaS']],
     summary: [
-      'Central de Saúde e Segurança do Trabalho que sustenta o SIGAC: ciclo do ASO (NR-07), matriz de NR-01 a NR-35, folha e absenteísmo.',
-      'Occupational health and safety hub behind SIGAC: medical-exam cycle (NR-07), NR-01 to NR-35 training matrix, payroll and absenteeism.',
+      'Sistema Integrado de Gestão Administrativa de Contratos, com central de Saúde e Segurança do Trabalho: ciclo do ASO (NR-07), matriz de NR-01 a NR-35, folha e absenteísmo.',
+      'Integrated Administrative Contract Management System, with an occupational health and safety hub: medical-exam cycle (NR-07), NR-01 to NR-35 training matrix, payroll and absenteeism.',
     ],
     stack: 'React 19 · Tailwind v4 · Firebase · Cloudflare R2',
     metric: [['AES-GCM 256 bits', 'AES-GCM 256 bits'], ['CID-10 cifrado no navegador', 'ICD-10 encrypted in the browser']],
   },
   {
     slug: 'caritas',
-    name: 'CARITAS',
-    logo: '/assets/projetos/caritas/logo.svg',
-    size: [400, 400],
     tags: [['HealthTech', 'HealthTech'], ['Psicologia', 'Psychology']],
     summary: [
       'Prontuário psicológico seguro com anamnese, resumo clínico por I.A., documentos CFP, agenda com link público e cobrança via PIX.',
@@ -103,7 +94,8 @@ function Home() {
       <Header links={links} />
 
       <main id="conteudo">
-        <section id="inicio" className="wrap pt-16 pb-14 md:pt-28 md:pb-24">
+        <section id="inicio" className="plate">
+          <div className="wrap pt-16 pb-14 md:pt-28 md:pb-24">
           <h1 className="max-w-[14ch] font-display text-[clamp(2.4rem,6.4vw,4.75rem)] leading-[1.12] font-normal tracking-[-0.01em]">
             <BlurText text={t('CONSTRUA DO SEU JEITO', 'BUILD IT YOUR WAY')} />
           </h1>
@@ -117,15 +109,14 @@ function Home() {
             <a href="#projetos" className="btn"><T pt="Conheça nossos projetos" en="Explore our projects" /><Arrow /></a>
             <a href="#contato" className="btn btn-outline"><T pt="Fale conosco" en="Contact us" /></a>
           </div>
+          </div>
         </section>
 
-        <Loop
-          label="Stack"
-          items={STACK}
-          itemClass="px-7 font-mono text-[0.9375rem] text-text-2 whitespace-nowrap after:ml-14 after:text-sage after:content-['/']"
-          speed="56s"
-        />
-        <div className="border-b border-line" />
+        <ul aria-label="Stack" className="wrap flex flex-wrap gap-x-6 gap-y-1 border-y border-line py-6 font-mono text-[0.9375rem] text-text-2">
+          {STACK.map((tech) => (
+            <li key={tech} className="after:ml-6 after:text-sage after:content-['/'] last:after:content-none">{tech}</li>
+          ))}
+        </ul>
 
         <section id="servicos" className="section" aria-labelledby="servicos-title">
           <div className="wrap">
@@ -162,10 +153,11 @@ function Home() {
               )}
             />
             <div className="border-t border-line">
-              {PROJECT_ROWS.map((p) => (
-                <article
+              {PROJECT_ROWS.map(({ slug, ...row }) => ({ slug, ...row, ...PROJECTS[slug] })).map((p) => (
+                <Spotlight
+                  as="article"
                   key={p.slug}
-                  style={themeOf(p.slug)}
+                  {...themeOf(p.slug)}
                   className="group grid gap-6 border-b border-line py-9 sm:grid-cols-[144px_minmax(0,1fr)] sm:gap-9 md:grid-cols-[200px_minmax(0,1fr)] md:gap-12 md:py-12"
                 >
                   <a href={`/projetos/${p.slug}/`} tabIndex={-1} aria-hidden="true" className="block w-30 self-start sm:w-auto">
@@ -175,7 +167,7 @@ function Home() {
                       width={p.size[0]}
                       height={p.size[1]}
                       loading="lazy"
-                      className="aspect-square w-full border border-line bg-tint object-contain p-4 transition-colors group-hover:border-line-2 md:p-6"
+                      className="paper aspect-square w-full border border-line bg-tint object-contain p-4 transition-colors group-hover:border-line-2 md:p-6"
                     />
                   </a>
                   <div>
@@ -194,7 +186,7 @@ function Home() {
                       <T pt="Ver projeto" en="View project" /><span className="sr-only"> {p.name}</span><Arrow />
                     </a>
                   </div>
-                </article>
+                </Spotlight>
               ))}
             </div>
           </div>
@@ -230,8 +222,8 @@ function Home() {
                 <h3 className="font-display text-[1.375rem] leading-[1.4] font-normal"><T pt="Inicie seu projeto" en="Start your project" /></h3>
                 <p className="mt-6 max-w-[680px] text-text-2">
                   <T
-                    pt="Seja para criar um novo site ou landing page de alto desempenho, construir um sistema SaaS escalável ou agendar uma apresentação aprofundada do Urbis, do HealthSearch ou do CARITAS, nossa equipe de engenharia e produto está pronta para atender seu projeto."
-                    en="Whether you need a high-performance website or landing page, a scalable SaaS system, or an in-depth demo of Urbis, HealthSearch or CARITAS, our engineering team is ready to deliver."
+                    pt="Seja para criar um novo site ou landing page de alto desempenho, construir um sistema SaaS escalável ou agendar uma apresentação aprofundada do Urbis, do SIGAC ou do CARITAS, nossa equipe de engenharia e produto está pronta para atender seu projeto."
+                    en="Whether you need a high-performance website or landing page, a scalable SaaS system, or an in-depth demo of Urbis, SIGAC or CARITAS, our engineering team is ready to deliver."
                   />
                 </p>
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

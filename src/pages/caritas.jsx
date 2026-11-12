@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { mount } from '../mount.jsx'
 import { T, useLang } from '../lang.jsx'
-import { Faq, Shot, useInView, useReducedMotion } from '../ui.jsx'
+import { Arrow, Faq, Shot, useInView, useReducedMotion } from '../ui.jsx'
 import { Close, Facts, H2, Hero, Points, ProjectPage } from '../project.jsx'
 
 // AI summary demo: types itself once visible; screen readers get the full text at once
@@ -60,16 +60,71 @@ function Sheets() {
         return (
           <li
             key={pt}
-            className="absolute top-4 left-1/2 flex aspect-[1/1.414] w-[42%] flex-col gap-2 border border-line-2 bg-white p-4 transition-transform duration-500 ease-out-expo [transform:translateX(calc(-50%+var(--x0)))_rotate(var(--r0))] group-hover:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))] group-focus-visible:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))]"
+            className="paper absolute top-4 left-1/2 flex aspect-[1/1.414] w-[42%] flex-col gap-2 border border-[#D6D3D1] bg-white p-4 transition-transform duration-500 ease-out-expo [transform:translateX(calc(-50%+var(--x0)))_rotate(var(--r0))] group-hover:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))] group-focus-visible:[transform:translateX(calc(-50%+var(--x1)))_rotate(var(--r1))]"
             style={{ '--x0': `${k * 24}%`, '--x1': `${k * 36}%`, '--r0': `${k * 4}deg`, '--r1': `${k * 7}deg`, zIndex: 5 - Math.abs(k) }}
           >
             <strong className="font-product text-[0.8125rem] leading-tight text-accent-ink">{t(pt, en)}</strong>
-            {[90, 100, 75, 85].map((w) => <i key={w} aria-hidden="true" className="h-1 bg-line" style={{ width: `${w}%` }} />)}
-            <small className="mt-auto font-mono text-[0.625rem] text-text-2">CRP 00/000000</small>
+            {[90, 100, 75, 85].map((w) => <i key={w} aria-hidden="true" className="h-1 bg-[#E7E5E4]" style={{ width: `${w}%` }} />)}
+            <small className="mt-auto font-mono text-[0.625rem] text-[#57534E]">CRP 00/000000</small>
           </li>
         )
       })}
     </ul>
+  )
+}
+
+const SLOTS = ['09:00', '10:30', '14:00', '16:30']
+
+// The public link, hands-on: the patient asks for a slot, then confirmation and PIX billing follow over WhatsApp.
+function Booking() {
+  const { t } = useLang()
+  const [slot, setSlot] = useState('14:00')
+  const [stage, setStage] = useState(0) // 0 choosing · 1 requested · 2 confirmed, PIX pending · 3 paid
+  const rows = [
+    [t('Pedido', 'Request'), stage >= 1 ? t(`Horário das ${slot} pedido pelo link`, `${slot} slot requested through the link`) : t('O paciente escolhe um horário livre', 'The patient picks an open slot')],
+    [t('Confirmação', 'Confirmation'), stage >= 2 ? t('Confirmada pelo WhatsApp', 'Confirmed over WhatsApp') : t('Você confirma pelo WhatsApp', 'You confirm over WhatsApp')],
+    [t('Cobrança por PIX', 'PIX billing'), stage >= 3 ? t('R$ 180,00 · Pago', 'R$ 180.00 · Paid') : stage === 2 ? t('R$ 180,00 · Aguardando', 'R$ 180.00 · Awaiting') : t('Segue pelo WhatsApp depois da confirmação', 'Follows over WhatsApp after confirmation')],
+  ]
+  const action = [t('Pedir horário', 'Request slot'), t('Confirmar pelo WhatsApp', 'Confirm over WhatsApp'), t('Simular pagamento', 'Simulate payment'), t('Recomeçar', 'Start over')][stage]
+  return (
+    <div className="border border-line-2 bg-bg">
+      <p className="flex items-baseline justify-between gap-4 border-b border-line bg-surface px-5 py-3">
+        <code className="font-mono text-[0.8125rem] text-accent-ink">/agendar/seu-nome</code>
+        <span className="text-[0.8125rem] text-text-2"><T pt="Dados fictícios" en="Demo data" /></span>
+      </p>
+      <div className="p-5">
+        <div className="grid grid-cols-4 gap-2" role="group" aria-label={t('Horários livres', 'Open slots')}>
+          {SLOTS.map((time) => (
+            <button
+              key={time}
+              type="button"
+              aria-pressed={slot === time}
+              disabled={stage > 0}
+              onClick={() => setSlot(time)}
+              className={`min-h-11 cursor-pointer border text-[0.9375rem] font-semibold tabular-nums transition-colors disabled:cursor-default ${
+                slot === time ? 'border-accent bg-accent text-bg' : 'border-line-2 text-text-2 hover:text-ink disabled:opacity-40 disabled:hover:text-text-2'
+              }`}
+            >
+              {time}
+            </button>
+          ))}
+        </div>
+        <ol className="mt-5 border-t border-line" aria-live="polite">
+          {rows.map(([title, detail], i) => (
+            <li key={i} className="grid grid-cols-[12px_1fr] gap-4 border-b border-line py-3.5">
+              <i aria-hidden="true" className={`mt-2 size-3 border border-accent transition-colors duration-500 ${stage > i ? 'bg-accent' : ''}`} />
+              <span>
+                <strong className="block font-product text-accent-ink">{title}</strong>
+                <span className="text-[0.9375rem] text-text-2">{detail}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <button type="button" className={`btn btn-sm mt-5 ${stage === 3 ? 'btn-outline' : ''}`} onClick={() => setStage((stage + 1) % 4)}>
+          {action}{stage < 3 && <Arrow />}
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -275,6 +330,28 @@ function Caritas() {
               ]}
             />
           </div>
+        </div>
+      </section>
+
+      <section id="agenda" className="section border-t border-line bg-surface" aria-labelledby="book-title">
+        <div className="wrap grid items-start gap-12 md:grid-cols-[1fr_1.05fr] md:gap-16">
+          <div>
+            <H2 id="book-title">{t('Agenda com link público, cobrança por PIX', 'A public booking link, billed by PIX')}</H2>
+            <p className="lead mt-6">
+              <T
+                pt="O paciente pede o horário pelo link. A confirmação e a cobrança seguem pelo WhatsApp."
+                en="The patient asks for a slot through the link. Confirmation and billing follow over WhatsApp."
+              />
+            </p>
+            <Points
+              className="mt-6"
+              items={[
+                [t('Um endereço seu', 'An address of your own'), t('cada profissional divulga o próprio /agendar/seu-nome.', 'each professional shares their own /agendar/your-name.')],
+                [t('Tudo no mesmo lugar', 'Everything in one place'), t('pacientes, agenda e finanças, com busca instantânea.', 'patients, schedule and finances, with instant search.')],
+              ]}
+            />
+          </div>
+          <Booking />
         </div>
       </section>
 

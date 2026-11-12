@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { T, useLang } from './lang.jsx'
+import { PROJECTS, themeOf } from './projects.js'
 
 const BORDER = 'M0 0h10v10h-10zM20 0h10v10h-10zM40 0h10v10h-10zM60 0h10v10h-10zM80 0h10v10h-10zM100 0h10v10h-10zM10 10h10v10h-10zM30 10h10v10h-10zM50 10h10v10h-10zM70 10h10v10h-10zM90 10h10v10h-10zM110 10h10v10h-10zM0 20h10v10h-10zM100 20h10v10h-10zM10 30h10v10h-10zM110 30h10v10h-10zM0 40h10v10h-10zM100 40h10v10h-10zM10 50h10v10h-10zM110 50h10v10h-10zM0 60h10v10h-10zM100 60h10v10h-10zM10 70h10v10h-10zM110 70h10v10h-10zM0 80h10v10h-10zM100 80h10v10h-10zM10 90h10v10h-10zM110 90h10v10h-10zM0 100h10v10h-10zM20 100h10v10h-10zM40 100h10v10h-10zM60 100h10v10h-10zM80 100h10v10h-10zM100 100h10v10h-10zM10 110h10v10h-10zM30 110h10v10h-10zM50 110h10v10h-10zM70 110h10v10h-10zM90 110h10v10h-10zM110 110h10v10h-10z'
 const CORE = 'M20 20h80v80H20zM45.5 38.5L66.7 57.1V38.5h7.8v43h-7.8V68.5L53.3 49.9v31.6h-7.8z'
@@ -93,18 +94,37 @@ export function CountUp({ to, decimals = 0 }) {
   )
 }
 
-// React Bits "Logo Loop" pattern; the copy track is hidden from assistive tech.
-export function Loop({ label, items, speed, itemClass }) {
-  const track = (hidden) => (
-    <ul className="loop__track" aria-hidden={hidden || undefined}>
-      {items.map((item, i) => <li key={i} className={itemClass}>{item}</li>)}
-    </ul>
-  )
+// React Bits "Spotlight Card" pattern: the pointer position feeds the .spotlight light in styles.css.
+export function Spotlight({ as: Tag = 'div', className = '', ...rest }) {
+  const move = (event) => {
+    const box = event.currentTarget.getBoundingClientRect()
+    event.currentTarget.style.setProperty('--sx', `${event.clientX - box.left}px`)
+    event.currentTarget.style.setProperty('--sy', `${event.clientY - box.top}px`)
+  }
+  return <Tag onPointerMove={move} className={`spotlight ${className}`} {...rest} />
+}
+
+const GLYPHS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789+/'
+
+// React Bits "Decrypted Text" pattern: whenever `text` changes it settles left to right out of noise.
+export function Scramble({ text }) {
+  const [shown, setShown] = useState(text)
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return setShown(text)
+    let frame = 0
+    const id = setInterval(() => {
+      frame += 1
+      const settled = Math.floor((frame * text.length) / 16)
+      setShown(text.slice(0, settled) + Array.from(text.slice(settled), () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]).join(''))
+      if (settled >= text.length) clearInterval(id)
+    }, 40)
+    return () => clearInterval(id)
+  }, [text])
   return (
-    <div className="loop" role="region" aria-label={label} style={{ '--loop-speed': speed }}>
-      {track(false)}
-      {track(true)}
-    </div>
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">{shown}</span>
+    </>
   )
 }
 
@@ -135,7 +155,37 @@ export function LangSwitch() {
   )
 }
 
-/** links: [{ href, label, current }] — hash links get scroll-spy highlighting on the Home. */
+// Light/dark for the whole site. The icon is drawn for both states and driven by CSS (.theme-ico in styles.css):
+// a drop wells up in the middle of the sun, swallows it and settles as the moon; the page change itself is in lang.jsx.
+export function ThemeSwitch({ className = '' }) {
+  const { t, theme, toggleTheme } = useLang()
+  const bite = useId()
+  return (
+    <button
+      type="button"
+      aria-pressed={theme === 'dark'}
+      onClick={toggleTheme}
+      className={`theme-switch min-h-11 min-w-11 cursor-pointer items-center justify-center gap-3 border border-line-2 text-[0.9375rem] text-text-2 transition-colors hover:bg-surface hover:text-ink ${className}`}
+    >
+      <svg viewBox="0 0 24 24" className="theme-ico size-5 overflow-visible" aria-hidden="true">
+        <mask id={bite} maskUnits="userSpaceOnUse" x="-12" y="-12" width="48" height="48">
+          <rect x="-12" y="-12" width="48" height="48" fill="#fff" />
+          <circle className="ico-bite" cx="16.5" cy="7.5" r="6" />
+        </mask>
+        <g className="ico-sun">
+          <circle cx="12" cy="12" r="3.6" fill="currentColor" />
+          <path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" strokeWidth="2" />
+        </g>
+        <g mask={`url(#${bite})`}>
+          <circle className="ico-drop" cx="12" cy="12" r="7" fill="currentColor" />
+        </g>
+      </svg>
+      <span className="md:sr-only">{t('Tema escuro', 'Dark theme')}</span>
+    </button>
+  )
+}
+
+/** links: [{ href, label, current, world }] — `world` is a project slug: the link carries that product's accent pixel. — hash links get scroll-spy highlighting on the Home. */
 export function Header({ links }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(null)
@@ -180,12 +230,12 @@ export function Header({ links }) {
           <Emblem className="size-8 md:size-9" />
           <span className="font-display text-[1.375rem] leading-none font-bold tracking-[0.04em]">NOXXD</span>
         </a>
-        <div className="flex items-center gap-3 md:gap-9">
+        <div className="flex items-center gap-3">
           <nav
             id="primary-nav"
             ref={nav}
             aria-label="Navegação principal / Main navigation"
-            className={`${open ? 'flex' : 'hidden'} absolute inset-x-0 top-full flex-col border-b border-line bg-bg px-6 py-3 md:static md:flex md:flex-row md:items-center md:gap-9 md:border-0 md:p-0`}
+            className={`${open ? 'flex' : 'hidden'} absolute inset-x-0 top-full flex-col border-b border-line bg-bg px-6 py-3 md:static md:mr-6 md:flex md:flex-row md:items-center md:gap-8 md:border-0 md:p-0`}
           >
             {links.map((link) => {
               const on = link.current || active === link.href
@@ -195,16 +245,20 @@ export function Header({ links }) {
                   href={link.href}
                   aria-current={link.current ? 'page' : undefined}
                   onClick={() => setOpen(false)}
-                  className={`border-b py-3.5 text-[0.9375rem] no-underline transition-colors last:border-b-0 md:py-1.5 md:last:border-b ${
+                  {...(link.world && themeOf(link.world))}
+                  className={`flex items-center gap-2.5 border-b py-3.5 text-[0.9375rem] no-underline transition-colors md:py-1.5 ${
                     on ? 'border-line text-ink md:border-ink' : 'border-line text-text-2 hover:text-ink md:border-transparent'
                   }`}
                 >
+                  {link.world && <i aria-hidden="true" className="size-1.5 flex-none bg-accent" />}
                   {link.label}
                 </a>
               )
             })}
+            <ThemeSwitch className="my-3 flex w-full md:hidden" />
           </nav>
           <LangSwitch />
+          <ThemeSwitch className="hidden md:inline-flex" />
           <button
             ref={toggle}
             type="button"
@@ -244,9 +298,12 @@ export function Footer() {
         </div>
         <nav className={col} aria-label="Projetos / Projects">
           <p className={head}><T pt="Projetos" en="Projects" /></p>
-          <a className={link} href="/projetos/urbis/">Urbis</a>
-          <a className={link} href="/projetos/healthsearch/">HealthSearch</a>
-          <a className={link} href="/projetos/caritas/">CARITAS</a>
+          {Object.entries(PROJECTS).map(([slug, p]) => (
+            <a key={slug} className={`${link} gap-2.5`} href={`/projetos/${slug}/`}>
+              <i aria-hidden="true" className="size-1.5 flex-none" style={{ background: p.accent[1] }} />
+              {p.name}
+            </a>
+          ))}
         </nav>
         <div className={col}>
           <p className={head}><T pt="Contato" en="Contact" /></p>
@@ -271,7 +328,7 @@ export function Footer() {
 export function Shot({ src, alt, width, height, url, caption, phone = false, eager = false, className = '' }) {
   return (
     <figure className={className}>
-      <div className={`border border-line-2 bg-bg ${phone ? 'mx-auto max-w-[300px] p-2' : ''}`}>
+      <div className={`border border-line-2 bg-bg ${eager ? '' : 'unroll'} ${phone ? 'mx-auto max-w-[300px] p-2' : ''}`}>
         {!phone && (
           <div className="flex items-center gap-2 border-b border-line bg-surface px-3 py-2" aria-hidden="true">
             <i className="size-2 bg-line-2" /><i className="size-2 bg-line-2" /><i className="size-2 bg-line-2" />
@@ -286,7 +343,7 @@ export function Shot({ src, alt, width, height, url, caption, phone = false, eag
           loading={eager ? 'eager' : 'lazy'}
           fetchPriority={eager ? 'high' : undefined}
           decoding="async"
-          className="block h-auto w-full"
+          className="dim block h-auto w-full"
         />
       </div>
       <figcaption className="mt-3 text-[0.875rem] leading-relaxed text-text-2">
