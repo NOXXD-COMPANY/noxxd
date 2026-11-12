@@ -34,10 +34,10 @@
 /* One muted accent, ink, tint and display face per product: same NOXXD frame, distinct worlds.
    The dark twin keeps the hue and lifts it for contrast on dark ground. */
 .theme-urbis, .theme-urbis :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#2F6B7C, #7FBBCC); --p-ink: light-dark(#16323B, #E6F1F4); --p-tint: light-dark(#EBF1F2, #15262B); }
-.theme-healthsearch, .theme-healthsearch :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#8A6A2E, #D3AC66); --p-ink: light-dark(#1F2D3D, #F1ECE2); --p-tint: light-dark(#F4EFE6, #262015); }
+.theme-sigac, .theme-sigac :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#8A6A2E, #D3AC66); --p-ink: light-dark(#1F2D3D, #F1ECE2); --p-tint: light-dark(#F4EFE6, #262015); }
 .theme-caritas, .theme-caritas :is(.band-night, .scope-light, .lightbox) { --p-accent: light-dark(#52599A, #A6ACE3); --p-ink: light-dark(#1E2238, #ECEDF7); --p-tint: light-dark(#EEEFF6, #1B1D2E); }
 .theme-urbis { --p-font: 'Manrope', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
-.theme-healthsearch { --p-font: 'Archivo', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
+.theme-sigac { --p-font: 'Archivo', 'Inter Fallback', sans-serif; --p-weight: 700; --p-tracking: -0.03em; }
 .theme-caritas { --p-font: 'Sora', 'Inter Fallback', sans-serif; --p-weight: 600; --p-tracking: -0.03em; }
 
 @theme {
@@ -460,12 +460,6 @@
   from { opacity: 0; transform: translateY(-0.375rem); }
 }
 
-/* React Bits "Logo Loop" pattern: two identical tracks slide forever; hover or focus pauses them. */
-.loop { display: flex; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.loop__track { display: flex; flex: none; animation: loop var(--loop-speed, 48s) linear infinite; }
-.loop:hover .loop__track, .loop:focus-within .loop__track { animation-play-state: paused; }
-@keyframes loop { to { transform: translate3d(-100%, 0, 0); } }
-
 /* Scroll reveal. Content is visible by default; ui.jsx sets [data-motion] only after it has marked
    what is already on screen, so nothing flashes and nothing depends on JS to be readable. */
 @media (prefers-reduced-motion: no-preference) {
@@ -498,9 +492,6 @@
     scroll-behavior: auto !important;
   }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
-  .loop { mask-image: none; flex-wrap: wrap; }
-  .loop__track { flex-wrap: wrap; }
-  .loop__track[aria-hidden] { display: none; }
 }
 
 /* Urbis status ribbon: each badge steps up in turn. */
@@ -509,7 +500,84 @@
   6%, 16% { transform: translateY(-3px); }
 }
 
-/* HealthSearch alert feed: the newest alert slides in on top. */
+/* SIGAC alert feed: a state that just changed slides in. */
 @keyframes feed-in {
   from { opacity: 0; transform: translateY(-12px); }
 }
+
+/* Theme change, "symbiote" style. toggleTheme (lang.jsx) animates a tendril outline (symbiote.js) as the
+   clip-path of the dark page snapshot: it grows over the light page, or shrinks back into the control.
+   The control is lifted out of the page snapshot so its icon keeps animating live on top. */
+.goo-vt::view-transition-old(root),
+.goo-vt::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+.goo-out::view-transition-old(root) { z-index: 1; }
+.goo-vt .theme-switch { view-transition-name: theme-switch; }
+.goo-vt::view-transition-group(theme-switch),
+.goo-vt::view-transition-new(theme-switch) { animation: none; }
+.goo-vt::view-transition-old(theme-switch) { display: none; }
+
+/* Theme icon: sun in light, moon in dark (a disc with a bite). Rest states first, then the two 900ms acts. */
+.theme-ico * { transform-origin: 12px 12px; }
+.ico-drop { transform: scale(0); }
+.ico-bite { transform: translate(9px, -9px); }
+html[data-theme='dark'] .ico-sun { transform: scale(0.4); opacity: 0; }
+html[data-theme='dark'] .ico-drop,
+html[data-theme='dark'] .ico-bite { transform: none; }
+
+/* Light to dark: a black drop wells up in the sun, wobbles as it swallows it, then the bite turns it into the moon. */
+.goo-run.goo-in .theme-ico { animation: ico-ink-in 900ms linear; }
+.goo-run.goo-in .ico-sun { animation: sun-in 900ms ease-in both; }
+.goo-run.goo-in .ico-drop { animation: drop-in 900ms ease-in-out both; }
+.goo-run.goo-in .ico-bite { animation: bite-in 900ms var(--ease-out-expo) both; }
+@keyframes ico-ink-in { 0%, 30% { color: #57534E; } } /* the page around the control is still light */
+@keyframes sun-in {
+  0% { transform: none; opacity: 1; }
+  28%, 100% { transform: scale(0.4) rotate(45deg); opacity: 0; }
+}
+@keyframes drop-in {
+  0% { transform: scale(0); fill: #0D0C0B; }
+  16% { transform: scale(1.3, 0.72); fill: #0D0C0B; }
+  30% { transform: scale(0.82, 1.24); fill: #0D0C0B; }
+  44% { transform: scale(1.12, 0.9); fill: #0D0C0B; }
+  58% { transform: scale(0.95, 1.06); }
+  72% { transform: scale(1.03, 0.98); }
+  100% { transform: none; }
+}
+@keyframes bite-in {
+  0%, 58% { transform: translate(9px, -9px); }
+  100% { transform: none; }
+}
+
+/* Dark to light: the moon fills back into a drop, stretches and is sucked into the centre; the sun pops out. */
+.goo-run.goo-out .theme-ico { animation: ico-ink-out 900ms linear; }
+.goo-run.goo-out .ico-sun { animation: sun-out 900ms var(--ease-out-expo) both; }
+.goo-run.goo-out .ico-drop { animation: drop-out 900ms ease-in-out both; }
+.goo-run.goo-out .ico-bite { animation: bite-out 900ms var(--ease-out-expo) both; }
+@keyframes ico-ink-out { 0%, 72% { color: #B8B1AA; } } /* the page around the control is still dark */
+@keyframes sun-out {
+  0%, 74% { transform: scale(0.4) rotate(45deg); opacity: 0; }
+  90% { transform: scale(1.14); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes drop-out {
+  0% { transform: none; }
+  34% { transform: scale(1.06, 0.95); }
+  50% { transform: scale(0.9, 1.12); }
+  64% { transform: scale(1.22, 0.74); }
+  78% { transform: scale(0.4, 1.3); }
+  90%, 100% { transform: scale(0); }
+}
+@keyframes bite-out {
+  0% { transform: none; }
+  34%, 100% { transform: translate(9px, -9px); }
+}
+
+
+/* Small square control inside the live demos, and the exam range (colour per state via --range). */
+.btn-sm { min-height: 44px; padding: 8px 16px; font-size: 0.875rem; }
+.btn-sm:disabled { opacity: 0.4; pointer-events: none; }
+.range { appearance: none; height: 44px; background: transparent; cursor: ew-resize; }
+.range::-webkit-slider-runnable-track { height: 2px; background: var(--c-line-2); }
+.range::-moz-range-track { height: 2px; background: var(--c-line-2); }
+.range::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; margin-top: -9px; border: 0; border-radius: 0; background: var(--range); transition: background-color 0.3s var(--ease-out-expo); }
+.range::-moz-range-thumb { width: 20px; height: 20px; border: 0; border-radius: 0; background: var(--range); transition: background-color 0.3s var(--ease-out-expo); }

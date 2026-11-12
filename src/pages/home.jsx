@@ -1,6 +1,6 @@
 import { mount } from '../mount.jsx'
 import { T, useLang } from '../lang.jsx'
-import { Arrow, CountUp, EmblemBuild, Faq, Loop, RiseText, Shell } from '../ui.jsx'
+import { Arrow, CountUp, EmblemBuild, Faq, RiseText, Shell } from '../ui.jsx'
 import { themeOf } from '../projects.js'
 
 const STACK = ['React 19', 'React Native', 'Expo', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Vite', 'Firebase', 'Supabase', 'Leaflet', 'Recharts', 'Cloudflare R2', 'jsPDF', 'GPT-4o-mini']
@@ -17,7 +17,7 @@ const VALUES = [
   ],
   [
     ['Produtos reais em operação', 'Real products in operation'],
-    ['Urbis, HealthSearch e CARITAS mostram como trabalhamos: do app do cidadão ao prontuário clínico.', 'Urbis, HealthSearch and CARITAS show how we work: from a citizen app to a clinical record.'],
+    ['Urbis, SIGAC e CARITAS mostram como trabalhamos: do app do cidadão ao prontuário clínico.', 'Urbis, SIGAC and CARITAS show how we work: from a citizen app to a clinical record.'],
   ],
 ]
 
@@ -66,11 +66,11 @@ const PROJECT_ROWS = [
     metric: [['Lei 14.129/2021', 'Law 14.129/2021'], ['Governo Digital + LGPD', 'Digital Government + LGPD']],
   },
   {
-    slug: 'healthsearch',
-    name: 'HealthSearch',
-    logo: '/assets/projetos/healthsearch/logo.svg',
+    slug: 'sigac',
+    name: 'SIGAC',
+    logo: '/assets/projetos/sigac/logo.svg',
     size: [120, 120],
-    shot: ['/assets/projetos/healthsearch/screens/dashboard.webp', 1440, 900, ['HealthSearch: painel de conformidade com a situação dos ASOs', 'HealthSearch: compliance dashboard with medical-exam status']],
+    shot: ['/assets/projetos/sigac/screens/dashboard.webp', 1440, 900, ['SIGAC: painel de conformidade com a situação dos ASOs', 'SIGAC: compliance dashboard with medical-exam status']],
     tags: [['SST / RH', 'OHS / HR'], ['SaaS', 'SaaS']],
     summary: [
       'Central de Saúde e Segurança do Trabalho que sustenta o SIGAC: ciclo do ASO (NR-07), matriz de NR-01 a NR-35, folha e absenteísmo.',
@@ -106,7 +106,7 @@ const STEPS = [
 const PROOF = [
   [3, 0, '', ['produtos próprios no portfólio', 'own products in the portfolio']],
   [4.55, 2, ' / 5', ['nota do CARITAS em heurísticas de Nielsen', 'CARITAS score on Nielsen heuristics']],
-  [256, 0, ' bits', ['de criptografia AES-GCM no navegador (HealthSearch)', 'of in-browser AES-GCM encryption (HealthSearch)']],
+  [256, 0, ' bits', ['de criptografia AES-GCM no navegador (SIGAC)', 'of in-browser AES-GCM encryption (SIGAC)']],
   [24, 0, ' h', ['úteis para responder solicitações técnicas e comerciais', 'business hours to answer technical and commercial inquiries']],
 ]
 
@@ -121,7 +121,7 @@ const FAQ = [
   ],
   [
     ['Posso ver uma demonstração dos produtos?', 'Can I see a demo of the products?'],
-    ['Sim. Agendamos uma apresentação aprofundada do Urbis, do HealthSearch ou do CARITAS.', 'Yes. We schedule an in-depth demo of Urbis, HealthSearch or CARITAS.'],
+    ['Sim. Agendamos uma apresentação aprofundada do Urbis, do SIGAC ou do CARITAS.', 'Yes. We schedule an in-depth demo of Urbis, SIGAC or CARITAS.'],
   ],
   [
     ['Em quanto tempo vocês respondem?', 'How quickly do you reply?'],
@@ -236,14 +236,9 @@ function Home() {
         </div>
       </section>
 
-      <div className="border-y border-line py-5">
-        <Loop
-          label="Stack"
-          items={STACK}
-          itemClass="px-7 font-mono text-md text-text-2 whitespace-nowrap after:ml-14 after:text-sage after:content-['/']"
-          speed="56s"
-        />
-      </div>
+      <ul aria-label="Stack" className="wrap flex flex-wrap gap-x-6 gap-y-2 border-y border-line py-6 font-mono text-md text-text-2">
+        {STACK.map((tech) => <li key={tech} className="after:ml-6 after:text-sage after:content-['/'] last:after:content-none">{tech}</li>)}
+      </ul>
 
       <section className="section" aria-labelledby="valor-title">
         <div className="wrap">
@@ -357,8 +352,8 @@ function Home() {
                 <h3 className="font-display text-h3"><T pt="Inicie seu projeto" en="Start your project" /></h3>
                 <p className="mt-4 max-w-(--container-measure) text-text-2">
                   <T
-                    pt="Seja para criar um novo site ou landing page de alto desempenho, construir um sistema SaaS escalável ou agendar uma apresentação aprofundada do Urbis, do HealthSearch ou do CARITAS, nossa equipe de engenharia e produto está pronta para atender seu projeto."
-                    en="Whether you need a high-performance website or landing page, a scalable SaaS system, or an in-depth demo of Urbis, HealthSearch or CARITAS, our engineering team is ready to deliver."
+                    pt="Seja para criar um novo site ou landing page de alto desempenho, construir um sistema SaaS escalável ou agendar uma apresentação aprofundada do Urbis, do SIGAC ou do CARITAS, nossa equipe de engenharia e produto está pronta para atender seu projeto."
+                    en="Whether you need a high-performance website or landing page, a scalable SaaS system, or an in-depth demo of Urbis, SIGAC or CARITAS, our engineering team is ready to deliver."
                   />
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

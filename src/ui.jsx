@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { symbiote } from './symbiote.js'
 import { T, useLang } from './lang.jsx'
 
 const BORDER = 'M0 0h10v10h-10zM20 0h10v10h-10zM40 0h10v10h-10zM60 0h10v10h-10zM80 0h10v10h-10zM100 0h10v10h-10zM10 10h10v10h-10zM30 10h10v10h-10zM50 10h10v10h-10zM70 10h10v10h-10zM90 10h10v10h-10zM110 10h10v10h-10zM0 20h10v10h-10zM100 20h10v10h-10zM10 30h10v10h-10zM110 30h10v10h-10zM0 40h10v10h-10zM100 40h10v10h-10zM10 50h10v10h-10zM110 50h10v10h-10zM0 60h10v10h-10zM100 60h10v10h-10zM10 70h10v10h-10zM110 70h10v10h-10zM0 80h10v10h-10zM100 80h10v10h-10zM10 90h10v10h-10zM110 90h10v10h-10zM0 100h10v10h-10zM20 100h10v10h-10zM40 100h10v10h-10zM60 100h10v10h-10zM80 100h10v10h-10zM100 100h10v10h-10zM10 110h10v10h-10zM30 110h10v10h-10zM50 110h10v10h-10zM70 110h10v10h-10zM90 110h10v10h-10zM110 110h10v10h-10z'
@@ -145,21 +146,6 @@ export function CountUp({ to, decimals = 0 }) {
   )
 }
 
-// React Bits "Logo Loop" pattern; the copy track is hidden from assistive tech.
-export function Loop({ label, items, speed, itemClass }) {
-  const track = (hidden) => (
-    <ul className="loop__track" aria-hidden={hidden || undefined}>
-      {items.map((item, i) => <li key={i} className={itemClass}>{item}</li>)}
-    </ul>
-  )
-  return (
-    <div className="loop" role="region" aria-label={label} style={{ '--loop-speed': speed }}>
-      {track(false)}
-      {track(true)}
-    </div>
-  )
-}
-
 // Uiverse-style segmented switch: one ink block slides under the active language.
 export function LangSwitch() {
   const { lang, setLang } = useLang()
@@ -187,26 +173,87 @@ export function LangSwitch() {
   )
 }
 
-// Follows the system theme until the visitor picks one; the choice lives in localStorage "noxxd_theme".
+// Light/dark for the whole site, with a "symbiote" change: a black mass leaves the button as tendrils (symbiote.js
+// shapes the clip-path, styles.css the timing of the icon). The choice lives in localStorage "noxxd_theme".
 export function ThemeToggle({ className = '' }) {
-  const toggle = () => {
+  const bite = useId()
+  const toggle = (event) => {
     const root = document.documentElement
+    if (root.classList.contains('goo-vt')) return // a change is already crawling across the page
     const current = root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     const next = current === 'dark' ? 'light' : 'dark'
-    swap(() => { root.dataset.theme = next })
+    const apply = () => {
+      root.dataset.theme = next
+      document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute('content', next === 'dark' ? '#141210' : '#FAFAF9')
+    }
     try {
       localStorage.setItem('noxxd_theme', next)
     } catch {
       // storage blocked: the choice lasts for this page view
     }
+    if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return apply()
+    const box = event.currentTarget.getBoundingClientRect()
+    const frames = symbiote(box.left + box.width / 2, box.top + box.height / 2, innerWidth, innerHeight)
+    const retreat = next === 'light' // the dark snapshot stays on top and shrinks back into the button
+    root.classList.add('goo-vt', retreat ? 'goo-out' : 'goo-in')
+    const change = document.startViewTransition(apply)
+    let crawl
+    change.ready
+      .then(() => {
+        root.classList.add('goo-run') // starts the icon animation in step with the mass
+        crawl = root.animate(frames, {
+          duration: 900,
+          easing: 'cubic-bezier(0.7, 0, 0.2, 1)', // a slow quarter of creeping tendrils, then the rush
+          direction: retreat ? 'reverse' : 'normal',
+          fill: 'both',
+          pseudoElement: retreat ? '::view-transition-old(root)' : '::view-transition-new(root)',
+        })
+      })
+      .catch(() => {}) // transition skipped (tab hidden, another one started): the theme is applied anyway
+    change.finished.finally(() => {
+      crawl?.cancel() // a filled animation outlives its snapshot: left alone, the retreat's empty clip hides the page on the next change
+      root.classList.remove('goo-vt', 'goo-in', 'goo-out', 'goo-run')
+    })
   }
   return (
-    <button type="button" className={`icon-btn ${className}`} onClick={toggle} aria-label="Alternar tema claro ou escuro / Toggle light or dark theme">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <g className="theme-sun"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></g>
-        <path className="theme-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
+    <button type="button" className={`icon-btn theme-switch ${className}`} onClick={toggle} aria-label="Alternar tema claro ou escuro / Toggle light or dark theme">
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="theme-ico">
+        <mask id={bite} maskUnits="userSpaceOnUse" x="-12" y="-12" width="48" height="48">
+          <rect x="-12" y="-12" width="48" height="48" fill="#fff" stroke="none" />
+          <circle className="ico-bite" cx="16.5" cy="7.5" r="6" fill="#000" stroke="none" />
+        </mask>
+        <g className="ico-sun">
+          <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" />
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+        </g>
+        <g mask={`url(#${bite})`}>
+          <circle className="ico-drop" cx="12" cy="12" r="7" fill="currentColor" stroke="none" />
+        </g>
       </svg>
     </button>
+  )
+}
+
+// React Bits "Decrypted Text" pattern: whenever `text` changes it settles left to right out of noise.
+const GLYPHS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789+/'
+export function Scramble({ text }) {
+  const [shown, setShown] = useState(text)
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return setShown(text)
+    let frame = 0
+    const id = setInterval(() => {
+      frame += 1
+      const settled = Math.floor((frame * text.length) / 16)
+      setShown(text.slice(0, settled) + Array.from(text.slice(settled), () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]).join(''))
+      if (settled >= text.length) clearInterval(id)
+    }, 40)
+    return () => clearInterval(id)
+  }, [text])
+  return (
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">{shown}</span>
+    </>
   )
 }
 
@@ -335,7 +382,7 @@ export function Footer() {
         <nav className={col} aria-label="Projetos / Projects">
           <p className={head}><T pt="Projetos" en="Projects" /></p>
           <a className={link} href="/projetos/urbis/">Urbis</a>
-          <a className={link} href="/projetos/healthsearch/">HealthSearch</a>
+          <a className={link} href="/projetos/sigac/">SIGAC</a>
           <a className={link} href="/projetos/caritas/">CARITAS</a>
         </nav>
         <div className={col}>

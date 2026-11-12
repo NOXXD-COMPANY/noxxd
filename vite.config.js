@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // Fonts each page paints first: body face everywhere, plus the page's display face.
-const DISPLAY = { urbis: 'manrope', healthsearch: 'archivo', caritas: 'sora' }
+const DISPLAY = { urbis: 'manrope', sigac: 'archivo', caritas: 'sora' }
 
 // Build only: adds <link rel="preload"> for those two font files, using their hashed names from the bundle.
 const preloadFonts = {
@@ -27,7 +27,7 @@ export default defineConfig({
       input: {
         home: 'index.html',
         urbis: 'projetos/urbis/index.html',
-        healthsearch: 'projetos/healthsearch/index.html',
+        sigac: 'projetos/sigac/index.html',
         caritas: 'projetos/caritas/index.html',
       },
     },

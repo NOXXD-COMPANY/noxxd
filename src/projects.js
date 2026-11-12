@@ -2,7 +2,7 @@
 // src/styles.css as .theme-<slug>, so they can follow the light and dark schemes.
 export const PROJECTS = {
   urbis: { name: 'Urbis' },
-  healthsearch: { name: 'HealthSearch' },
+  sigac: { name: 'SIGAC' },
   caritas: { name: 'CARITAS' },
 }
 

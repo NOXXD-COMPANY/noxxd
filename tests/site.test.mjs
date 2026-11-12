@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const read = (file) => readFileSync(join(root, file), 'utf8')
 const sources = [
   'index.html',
-  ...['urbis', 'healthsearch', 'caritas'].map((slug) => `projetos/${slug}/index.html`),
+  ...['urbis', 'sigac', 'caritas'].map((slug) => `projetos/${slug}/index.html`),
   ...readdirSync(join(root, 'src'), { recursive: true }).filter((f) => /\.jsx?$/.test(f)).map((f) => join('src', f)),
 ]
 
@@ -42,7 +42,7 @@ test('pages keep the custom domain, canonical URL and English title', () => {
 
 
 test('every screenshot has its half-width "-sm" twin for srcset', () => {
-  for (const slug of ['urbis', 'healthsearch', 'caritas']) {
+  for (const slug of ['urbis', 'sigac', 'caritas']) {
     const dir = join(root, 'public/assets/projetos', slug, 'screens')
     for (const file of readdirSync(dir).filter((f) => !f.endsWith('-sm.webp'))) {
       assert.ok(existsSync(join(dir, file.replace('.webp', '-sm.webp'))), `${slug}/${file} lacks a -sm twin`)
@@ -56,4 +56,14 @@ test('pages set the saved theme before paint and load no third-party fonts', () 
     assert.match(html, /getItem\('noxxd_theme'\)/, `${file} lacks the theme pre-paint guard`)
     assert.doesNotMatch(html, /fonts\.googleapis\.com/, `${file} still loads Google Fonts`)
   }
+})
+
+test('the theme symbiote starts inside the control and ends past every corner', async () => {
+  const { symbiote } = await import('../src/symbiote.js')
+  const [cx, cy, w, h] = [1180, 36, 1280, 800]
+  const frames = symbiote(cx, cy, w, h, 7)
+  const reach = (frame) => [...frame.clipPath.matchAll(/(-?[\d.]+)px (-?[\d.]+)px/g)].map(([, x, y]) => Math.hypot(x - cx, y - cy))
+  assert.equal(Math.max(...reach(frames[0])), 0)
+  assert.ok(Math.min(...reach(frames.at(-1))) >= Math.hypot(cx, h - cy), 'last frame leaves part of the viewport uncovered')
+  assert.equal(new Set(frames.map((frame) => reach(frame).length)).size, 1, 'frames must share a vertex count to interpolate')
 })
