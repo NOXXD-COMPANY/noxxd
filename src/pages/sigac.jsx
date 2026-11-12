@@ -4,8 +4,15 @@ import { T, useLang } from '../lang.jsx'
 import { Faq, Scramble, Shot } from '../ui.jsx'
 import { Close, Facts, H2, Hero, Points, ProjectPage } from '../project.jsx'
 
-// SIGAC traffic light and ASO states, muted
-const C = { ok: '#4F7A4A', due: '#9A6E1F', late: '#A2483E', requested: '#5B5F97', booked: '#3F6E8C', pending: '#78716C' }
+// SIGAC traffic light and ASO states, muted; the dark twin is lifted so the label keeps its contrast
+const C = {
+  ok: 'light-dark(#4F7A4A, #9CCB90)',
+  due: 'light-dark(#9A6E1F, #DDBE78)',
+  late: 'light-dark(#A2483E, #E8A097)',
+  requested: 'light-dark(#5B5F97, #A6ACE3)',
+  booked: 'light-dark(#3F6E8C, #8FBBD6)',
+  pending: 'light-dark(#78716C, #A8A29E)',
+}
 
 const DUE = [6, 12, 33]
 const LATE = [18, 35]
@@ -36,7 +43,7 @@ function Matrix() {
         {NRS.map(({ n, status }) => (
           <li
             key={n}
-            className={`grid aspect-square place-items-center rounded-sm font-mono text-xs transition-opacity duration-(--dur-2) ${status === 'ok' ? 'tone' : 'text-white'}`}
+            className={`grid aspect-square place-items-center rounded-sm font-mono text-xs transition-opacity duration-(--dur-2) ${status === 'ok' ? 'tone' : 'text-on-accent'}`}
             // only exceptions are solid; compliant standards stay a quiet tint
             style={{ '--l': '#3D5F39', '--d': '#A9CDA3', background: status === 'ok' ? undefined : C[status], opacity: show === 'all' || show === status ? 1 : 0.15 }}
           >
@@ -55,7 +62,7 @@ function Matrix() {
               show === key ? 'border-ink bg-ink text-bg' : 'border-line-2 text-text-2 hover:text-ink'
             }`}
           >
-            <i aria-hidden="true" className="size-2 rounded-xs" style={{ background: color }} />
+            <i aria-hidden="true" className="size-2.5 rounded-xs" style={{ background: color }} />
             {label}
           </button>
         ))}
@@ -99,16 +106,16 @@ function Feed({ items }) {
       </label>
       <ul className="mt-5 border-t border-line" aria-label={t('Alertas', 'Alerts')}>
         <li key={state} className="grid animate-[feed-in_0.6s_var(--ease-out-expo)] grid-cols-[10px_1fr_auto] items-start gap-4 border-b border-line py-4">
-          <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: C[state] }} />
+          <i aria-hidden="true" className="mt-2 size-2.5 rounded-xs" style={{ background: C[state] }} />
           <span>
             <strong className="block font-semibold text-ink"><T pt="ASO periódico" en="Periodic exam" /> · Igor Batista</strong>
             <small className="text-sm text-text-2">{detail}</small>
           </span>
-          <b className="px-2.5 py-1 text-xs whitespace-nowrap text-white" style={{ background: C[state] }}>{label}</b>
+          <b className="px-2.5 py-1 text-xs whitespace-nowrap text-on-accent" style={{ background: C[state] }}>{label}</b>
         </li>
         {items.map(([title, detail, color]) => (
           <li key={title} className="grid grid-cols-[10px_1fr] gap-4 border-b border-line py-4">
-            <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: color }} />
+            <i aria-hidden="true" className="mt-2 size-2.5 rounded-xs" style={{ background: color }} />
             <span>
               <strong className="block font-semibold text-ink">{title}</strong>
               <small className="text-sm text-text-2">{detail}</small>
@@ -215,7 +222,7 @@ function Palette({ items }) {
       <ul aria-label={t('Resultados', 'Results')}>
         {hits.map(([title, detail, color]) => (
           <li key={title} className="grid grid-cols-[10px_1fr] gap-4 border-b border-line px-4 py-3 last:border-b-0">
-            <i aria-hidden="true" className="mt-2 size-2.5" style={{ background: color }} />
+            <i aria-hidden="true" className="mt-2 size-2.5 rounded-xs" style={{ background: color }} />
             <span>
               <strong className="block text-md font-semibold text-ink">{title}</strong>
               <small className="text-xs text-text-2">{detail}</small>
@@ -262,8 +269,8 @@ function SIGAC() {
               [t('A Vencer', 'Due Soon'), t('Janela preventiva de 30 dias antes do vencimento normativo.', 'A 30-day preventive window before the regulatory deadline.'), C.due],
               [t('Vencido', 'Expired'), t('ASO expirado: inconformidade imediata com a NR-07, sinalizada no painel.', 'Expired exam: immediate NR-07 non-compliance, flagged on the dashboard.'), C.late],
             ].map(([title, text, color]) => (
-              <div key={title} className="grid grid-cols-[12px_1fr] gap-4">
-                <i aria-hidden="true" className="mt-2 size-3" style={{ background: color }} />
+              <div key={title} className="grid grid-cols-[10px_1fr] gap-4">
+                <i aria-hidden="true" className="mt-2 size-2.5 rounded-xs" style={{ background: color }} />
                 <div>
                   <p className="h-display text-xl">{title}</p>
                   <p className="text-text-2">{text}</p>

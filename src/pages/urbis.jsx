@@ -21,21 +21,21 @@ function Badge({ status }) {
       className="tone inline-flex items-center gap-2 rounded-sm px-3.5 py-2 text-sm font-semibold whitespace-nowrap"
       style={{ '--l': light, '--d': dark }}
     >
-      <i aria-hidden="true" className="size-2 rounded-xs bg-current" />
+      <i aria-hidden="true" className="size-2.5 rounded-xs bg-current" />
       {t(pt, en)}
     </span>
   )
 }
 
 const CATEGORIES = [
-  ['Buraco na via', 'Pothole', '#A2483E'],
-  ['Acúmulo de lixo', 'Waste build-up', '#A87B2C'],
-  ['Enchente', 'Flooding', '#3F6E8C'],
-  ['Deslizamento', 'Landslide', '#6B5B8C'],
-  ['Poluição sonora', 'Noise', '#94597A'],
-  ['Vandalismo', 'Vandalism', '#78716C'],
-  ['Iluminação pública', 'Street lighting', '#B07A3E'],
-  ['Obras sem sinalização', 'Unsigned works', '#3F7A6E'],
+  ['Buraco na via', 'Pothole'],
+  ['Acúmulo de lixo', 'Waste build-up'],
+  ['Enchente', 'Flooding'],
+  ['Deslizamento', 'Landslide'],
+  ['Poluição sonora', 'Noise'],
+  ['Vandalismo', 'Vandalism'],
+  ['Iluminação pública', 'Street lighting'],
+  ['Obras sem sinalização', 'Unsigned works'],
 ]
 
 const FLOW = ['pendente', 'analise', 'andamento', 'resolvido']
@@ -60,7 +60,7 @@ function Report() {
   const [trail, setTrail] = useState([]) // statuses the report has been through; empty until it is sent
   const status = trail.at(-1)
   const next = FLOW.includes(status) ? FLOW[FLOW.indexOf(status) + 1] : undefined // rejected reports are closed
-  const [catPt, catEn, catDot] = CATEGORIES[cat]
+  const [catPt, catEn] = CATEGORIES[cat]
   const reset = () => {
     setStep(0)
     setTrail([])
@@ -106,7 +106,7 @@ function Report() {
 
             {step === 0 && (
               <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={t('Categoria da ocorrência', 'Report category')}>
-                {CATEGORIES.map(([pt, en, dot], i) => (
+                {CATEGORIES.map(([pt, en], i) => (
                   <button
                     key={pt}
                     type="button"
@@ -114,7 +114,6 @@ function Report() {
                     onClick={() => setCat(i)}
                     className={`inline-flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border px-3.5 text-sm font-semibold transition-colors ${cat === i ? 'border-ink bg-ink text-bg' : 'border-line-2 text-text-2 hover:text-ink'}`}
                   >
-                    <i aria-hidden="true" className="size-2 flex-none" style={{ background: dot }} />
                     {t(pt, en)}
                   </button>
                 ))}
@@ -152,7 +151,7 @@ function Report() {
             {step === 2 && (
               <dl className="mt-4 border-t border-line text-md">
                 {[
-                  [t('Categoria', 'Category'), <><i aria-hidden="true" className="mr-2 inline-block size-2" style={{ background: catDot }} />{t(catPt, catEn)}</>],
+                  [t('Categoria', 'Category'), t(catPt, catEn)],
                   [t('Evidências', 'Evidence'), evidence],
                   [t('Local', 'Location'), t('Rua das Acácias, 120 · Centro', '120 Acácias St · Downtown')],
                 ].map(([dt, dd]) => (
@@ -183,7 +182,6 @@ function Report() {
           <div className="p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="font-semibold text-ink">
-                <i aria-hidden="true" className="mr-2.5 inline-block size-2" style={{ background: catDot }} />
                 {t(catPt, catEn)} <span className="ml-2 font-normal text-text-2 tabular-nums">2026-0412</span>
               </p>
               <Badge status={status} />
