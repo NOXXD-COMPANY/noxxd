@@ -3,7 +3,6 @@ import { T, useLang } from '../lang.jsx'
 import { Arrow, CountUp, EmblemBuild, Faq, RiseText, Shell } from '../ui.jsx'
 import { themeOf } from '../projects.js'
 
-const STACK = ['React 19', 'React Native', 'Expo', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Vite', 'Firebase', 'Supabase', 'Leaflet', 'Recharts', 'Cloudflare R2', 'jsPDF', 'GPT-4o-mini']
 
 // Three reasons, each taken from what the products already do.
 const VALUES = [
@@ -235,10 +234,6 @@ function Home() {
           <EmblemBuild className="w-20 text-ink max-xl:order-first sm:w-24 xl:w-[clamp(15rem,24vw,21rem)]" />
         </div>
       </section>
-
-      <ul aria-label="Stack" className="wrap flex flex-wrap gap-x-6 gap-y-2 border-y border-line py-6 font-mono text-md text-text-2">
-        {STACK.map((tech) => <li key={tech} className="after:ml-6 after:text-sage after:content-['/'] last:after:content-none">{tech}</li>)}
-      </ul>
 
       <section className="section" aria-labelledby="valor-title">
         <div className="wrap">
