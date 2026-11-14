@@ -361,7 +361,7 @@ export function Header({ links }) {
   )
 }
 
-const WA = 'https://wa.me/5575981802188'
+const WA = 'https://wa.me/5551996761711'
 
 export function Footer() {
   const col = 'flex flex-col gap-1 text-md'

@@ -129,7 +129,7 @@ const FAQ = [
 ]
 
 const MAIL = 'mailto:contato@noxxd.com.br'
-const WA = 'https://wa.me/5575981802188'
+const WA = 'https://wa.me/5551996761711'
 
 function SectionHead({ id, title, lead }) {
   return (
@@ -369,7 +369,7 @@ function Home() {
                   <dt className="text-xs font-semibold text-text-2"><T pt="E-mail corporativo" en="Corporate email" /></dt>
                   <dd className="mb-4"><a href={MAIL} className="text-link text-lg">contato@noxxd.com.br</a></dd>
                   <dt className="text-xs font-semibold text-text-2"><T pt="WhatsApp comercial" en="Commercial WhatsApp" /></dt>
-                  <dd className="mb-4"><a href={WA} target="_blank" rel="noopener noreferrer" className="text-link text-lg tabular-nums">+55 (75) 98180-2188</a></dd>
+                  <dd className="mb-4"><a href={WA} target="_blank" rel="noopener noreferrer" className="text-link text-lg tabular-nums">+55 (51) 99676-1711</a></dd>
                 </dl>
                 <p className="text-md text-text-2">
                   <T
