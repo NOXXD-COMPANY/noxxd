@@ -309,11 +309,11 @@ function SIGAC() {
           <Shot
             className="mt-14"
             src="/assets/projetos/sigac/screens/ficha-colaborador.webp"
-            alt={t('SIGAC: ficha do funcionário com dados, NRs aplicáveis e histórico de ASOs', 'SIGAC: employee profile with details, applicable NRs and exam history')}
+            alt={t('SIGAC: ficha do funcionário com identificação, vínculo, condições de trabalho e NRs aplicáveis', 'SIGAC: employee profile with identification, employment, working conditions and applicable NRs')}
             width={1440}
             height={900}
-            url="/funcionarios/func_003"
-            caption={t('Ficha do funcionário: vínculo, NRs aplicáveis e histórico de ASOs com status', 'Employee profile: employment, applicable NRs and exam history with status')}
+            url="/funcionarios/func_doc_23"
+            caption={t('Ficha do funcionário: identificação, vínculo, condições de trabalho e NRs aplicáveis', 'Employee profile: identification, employment, working conditions and applicable NRs')}
           />
         </div>
       </section>
@@ -356,11 +356,11 @@ function SIGAC() {
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
             <Shot
               src="/assets/projetos/sigac/screens/dashboard.webp"
-              alt={t('SIGAC: painel de conformidade com ASOs vencidos, a vencer e gráfico de vencimentos', 'SIGAC: compliance dashboard with expired and due exams and an expiry chart')}
+              alt={t('SIGAC: painel de conformidade com a fila de ação de ASOs e NRs, filtros por empresa, contrato e localidade', 'SIGAC: compliance dashboard with the ASO and NR action queue and company, contract and site filters')}
               width={1440}
               height={900}
               url="/dashboard"
-              caption={t('Painel de conformidade: situação dos ASOs, filtros por empresa e próximos vencimentos', 'Compliance dashboard: exam status, company filters and upcoming expirations')}
+              caption={t('Painel de conformidade: fila de ação de ASOs e NRs, com filtros por empresa, contrato e localidade', 'Compliance dashboard: ASO and NR action queue with company, contract and site filters')}
             />
             <dl className="border-t border-line">
               {[
@@ -375,6 +375,38 @@ function SIGAC() {
                 </div>
               ))}
             </dl>
+          </div>
+        </div>
+      </section>
+
+      <section className="section border-t border-line" aria-labelledby="more-title">
+        <div data-reveal className="wrap">
+          <H2 id="more-title">{t('Indicadores e acesso seguro', 'Analytics and secure access')}</H2>
+          <p className="lead mt-6">
+            <T
+              pt="O BI mostra onde a operação está irregular e como chegou ali; o acesso é por e-mail corporativo, com sessão que encerra após 8 horas sem uso."
+              en="The BI view shows where the operation is out of compliance and how it got there; access is by corporate email, with a session that ends after 8 hours of inactivity."
+            />
+          </p>
+          <div className="mt-12 grid gap-10 lg:grid-cols-2">
+            <Shot
+              src="/assets/projetos/sigac/screens/bi.webp"
+              alt={t('SIGAC: BI e indicadores com ASOs vencidos, a vencer e taxa de conformidade', 'SIGAC: BI and indicators with expired and due exams and compliance rate')}
+              width={1440}
+              height={900}
+              url="/bi"
+              caption={t('BI e indicadores: irregularidades, treinamentos, exames e gastos', 'BI and indicators: irregularities, training, exams and costs')}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
+            <Shot
+              src="/assets/projetos/sigac/screens/login.webp"
+              alt={t('SIGAC: tela de login com e-mail corporativo e selo do sistema', 'SIGAC: login screen with corporate email and the system seal')}
+              width={1440}
+              height={900}
+              url="/login"
+              caption={t('Tela de entrada com e-mail corporativo e recuperação de senha', 'Sign-in screen with corporate email and password recovery')}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
           </div>
         </div>
       </section>
